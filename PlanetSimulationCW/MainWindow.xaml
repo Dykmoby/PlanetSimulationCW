@@ -6,12 +6,19 @@
         xmlns:local="clr-namespace:PlanetSimulationCW"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid x:Name="mainGrid" Background="White">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition></RowDefinition>
-        </Grid.RowDefinitions>
-        <Button Content="Generate Bitmap" Width="120" Margin="5" Padding="10" HorizontalAlignment="Center"></Button>
-        <Image Grid.Row="1" Source="{Binding ImgSource}" Margin="5" Width="400" Height="300" IsHitTestVisible="False"></Image>
+    <Grid x:Name="mainGrid" Background="Black">
+        <Viewport3D ClipToBounds="True">
+            <Viewport3D.Camera>
+                <PerspectiveCamera Position="200,200,300" LookDirection="0,0,-1" UpDirection="0,1,0" />
+            </Viewport3D.Camera>
+            <Viewport3D.Children>
+                <ModelVisual3D>
+                    <ModelVisual3D.Content>
+                        <AmbientLight Color="White" />
+                    </ModelVisual3D.Content>
+                </ModelVisual3D>
+                <ModelVisual3D Content="{Binding ModelGroup}"/>
+            </Viewport3D.Children>
+        </Viewport3D>
     </Grid>
 </Window>

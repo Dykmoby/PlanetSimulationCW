@@ -4,13 +4,13 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 
 namespace PlanetSimulationCW.Model
 {
     class Planet
     {
         public Vector2 Position { get; private set; }
-        private Vector2 a;
         public Vector2 Velocity { get; private set; }
         public float Mass { get; private set; }
         public float Radius { get; private set; }
