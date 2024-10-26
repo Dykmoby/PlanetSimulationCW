@@ -42,7 +42,7 @@ namespace PlanetSimulationCW.ModelView
             simulation = new Simulation(100);
 
             Camera = new PerspectiveCamera();
-            Camera.Position = new Point3D(200, 200, 300);
+            Camera.Position = new Point3D(100, 100, 300);
             Camera.LookDirection = new Vector3D(0, 0, -1);
             Camera.UpDirection = new Vector3D(0, 1, 0);
 
@@ -120,7 +120,7 @@ namespace PlanetSimulationCW.ModelView
             {
                 GeometryModel3D geometryModel = MeshUtils.CreatePlanetGeometryModel();
                 Transform3DGroup transformGroup = new Transform3DGroup();
-                transformGroup.Children.Add(new TranslateTransform3D(planet.Position.X, planet.Position.Y, -2)); // Добавить сюда потом planet.Position.Z
+                transformGroup.Children.Add(new TranslateTransform3D(planet.Position.X, planet.Position.Y, planet.Position.Z));
                 geometryModel.Transform = transformGroup;
 
                 modelGroup.Children.Add(geometryModel);

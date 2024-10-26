@@ -18,7 +18,7 @@ namespace PlanetSimulationCW.Model
 
             for (int i = 0; i < planetCount; i++)
             {
-                Vector2 planetPosition = new Vector2(rand.Next(0, 500), rand.Next(0, 500));
+                Vector3 planetPosition = new Vector3(rand.Next(0, 200), rand.Next(0, 200), rand.Next(0, 200));
                 float planetRadius = rand.Next(10, 40) / 10.0f;
                 float planetMass = (float) (Math.PI * planetRadius * planetRadius);
 
@@ -42,9 +42,9 @@ namespace PlanetSimulationCW.Model
                         continue;
                     }
 
-                    Vector2 delta = planets[k].Position - planets[i].Position;
+                    Vector3 delta = planets[k].Position - planets[i].Position;
 
-                    float distanceSqr = Vector2.Dot(delta, delta);
+                    float distanceSqr = Vector3.Dot(delta, delta);
 
                     // Collision
                     if (distanceSqr < (planets[i].Radius + planets[k].Radius) * (planets[i].Radius + planets[k].Radius))
@@ -62,7 +62,7 @@ namespace PlanetSimulationCW.Model
                     }
 
                     float invDistanceSqr = 1.0f / distanceSqr;
-                    Vector2 direction = Vector2.Normalize(delta);
+                    Vector3 direction = Vector3.Normalize(delta);
 
                     float velocity = (float)(10000000000 * G * planets[k].Mass * invDistanceSqr);
 
