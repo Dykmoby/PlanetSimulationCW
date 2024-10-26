@@ -64,7 +64,7 @@ namespace PlanetSimulationCW.Model
                     float invDistanceSqr = 1.0f / distanceSqr;
                     Vector3 direction = Vector3.Normalize(delta);
 
-                    float velocity = (float)(10000000000 * G * planets[k].Mass * invDistanceSqr);
+                    float velocity = (float)(1000000000 * G * planets[k].Mass * invDistanceSqr);
 
                     planets[i].AddVelocity(direction * velocity);
 

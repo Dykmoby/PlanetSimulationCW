@@ -22,5 +22,20 @@ namespace PlanetSimulationCW
         {
             ((MainVM)mainGrid.DataContext).KeyDownCommand.Execute(e);
         }
+
+        private void Window_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ((MainVM)mainGrid.DataContext).MouseRightButtonDownCommand.Execute(e);
+        }
+
+        private void Window_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            ((MainVM)mainGrid.DataContext).MouseRightButtonUpCommand.Execute(e);
+        }
+
+        private void Window_MouseMove(object sender, MouseEventArgs e)
+        {
+            ((MainVM)mainGrid.DataContext).MouseMoveCommand.Execute(e);
+        }
     }
 }

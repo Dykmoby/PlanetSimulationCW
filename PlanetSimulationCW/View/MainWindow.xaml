@@ -7,7 +7,10 @@
         xmlns:local="clr-namespace:PlanetSimulationCW"
         mc:Ignorable="d"    
         Title="MainWindow" Height="450" Width="800"
-        KeyDown="Window_KeyDown">
+        KeyDown="Window_KeyDown"
+        MouseRightButtonDown="Window_MouseRightButtonDown"
+        MouseRightButtonUp="Window_MouseRightButtonUp"
+        MouseMove="Window_MouseMove">
     <Grid x:Name="mainGrid" Background="Black">
         <Viewport3D ClipToBounds="True" Camera="{Binding Camera}">
             <Viewport3D.Children>
@@ -19,5 +22,6 @@
                 <ModelVisual3D Content="{Binding ModelGroup}"/>
             </Viewport3D.Children>
         </Viewport3D>
+        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding Log}" VerticalAlignment="Top" Foreground="White"/>
     </Grid>
 </Window>
