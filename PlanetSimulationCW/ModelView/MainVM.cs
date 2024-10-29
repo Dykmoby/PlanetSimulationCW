@@ -169,10 +169,10 @@ namespace PlanetSimulationCW.ModelView
                               moveDirection = -Camera.LookDirection;
                               break;
                           case Key.A:
-                              moveDirection = -Vector3D.CrossProduct(Camera.LookDirection, new Vector3D(0, 1, 0));
+                              moveDirection = -Vector3D.CrossProduct(Camera.LookDirection, Camera.UpDirection);
                               break;
                           case Key.D:
-                              moveDirection = Vector3D.CrossProduct(Camera.LookDirection, new Vector3D(0, 1, 0));
+                              moveDirection = Vector3D.CrossProduct(Camera.LookDirection, Camera.UpDirection);
                               break;
                       }
 
