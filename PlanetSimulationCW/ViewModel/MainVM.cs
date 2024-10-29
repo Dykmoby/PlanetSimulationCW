@@ -8,7 +8,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 
-namespace PlanetSimulationCW.ModelView
+namespace PlanetSimulationCW.ViewModel
 {
     public static class QuaternionExtensions
     {

@@ -1,5 +1,5 @@
 ﻿using PlanetSimulationCW.Model;
-using PlanetSimulationCW.ModelView;
+using PlanetSimulationCW.ViewModel;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
