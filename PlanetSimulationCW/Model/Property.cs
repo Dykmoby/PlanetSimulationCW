@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PlanetSimulationCW
+namespace PlanetSimulationCW.Model
 {
     public class Property : INotifyPropertyChanged
     {

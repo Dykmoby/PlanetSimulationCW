@@ -1,39 +1,18 @@
 ﻿using PlanetSimulationCW.Model;
-using System.Collections.ObjectModel;
-using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 
 namespace PlanetSimulationCW.ViewModel
 {
-    public static class QuaternionExtensions
-    {
-        // Вспомогательный метод расширения для поворота вектора кватернионом
-        public static Vector3D Rotate(this Quaternion q, Vector3D v, double rotationSpeed = 1)
-        {
-            Quaternion vQuat = new Quaternion(v, rotationSpeed);
-            Quaternion resultQuat = q * vQuat * Conjugate(q);
-            return new Vector3D(resultQuat.X, resultQuat.Y, resultQuat.Z);
-        }
-
-        // Метод расширения для сопряжения кватерниона
-        public static Quaternion Conjugate(Quaternion q)
-        {
-            return new Quaternion(-q.X, -q.Y, -q.Z, q.W);
-        }
-    }
-
     class MainVM : Property
     {
-        int frame = 0;
-
         private Point prevMousePos;
         private Quaternion rotation = Quaternion.Identity;
         private double rotationSpeed = 5;
+
+        Simulation simulation;
 
         private Model3DGroup modelGroup;
         private PerspectiveCamera camera;
@@ -69,7 +48,10 @@ namespace PlanetSimulationCW.ViewModel
             }
         }
 
-        Simulation simulation;
+        public RelayCommand<MouseButtonEventArgs> MouseRightButtonDownCommand { get; private set; }
+        public RelayCommand<MouseEventArgs> MouseMoveCommand { get; private set; }
+        public RelayCommand<MouseButtonEventArgs> MouseRightButtonUpCommand { get; private set; }
+        public RelayCommand<KeyEventArgs> KeyDownCommand { get; private set; }
 
         public MainVM()
         {
@@ -82,12 +64,13 @@ namespace PlanetSimulationCW.ViewModel
 
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(30);
-            timer.Tick += Render;
+            timer.Tick += Update;
             timer.Start();
 
             MouseRightButtonDownCommand = new RelayCommand<MouseButtonEventArgs>(OnMouseRightButtonDown);
             MouseMoveCommand = new RelayCommand<MouseEventArgs>(OnMouseMove);
             MouseRightButtonUpCommand = new RelayCommand<MouseButtonEventArgs>(OnMouseRightButtonUp);
+            KeyDownCommand = new RelayCommand<KeyEventArgs>(OnKeyDown);
         }
 
         private void OnMouseRightButtonDown(MouseButtonEventArgs e)
@@ -127,6 +110,36 @@ namespace PlanetSimulationCW.ViewModel
             Mouse.Capture(null);
         }
 
+        private void OnKeyDown(KeyEventArgs e)
+        {
+            const float moveRate = 10;
+            const float rotationSensitivity = 0.05f;
+            Vector3D rotation = new Vector3D();
+            Vector3D moveDirection = new Vector3D();
+
+            switch (e.Key)
+            {
+                case Key.W:
+                    moveDirection = Camera.LookDirection;
+                    break;
+                case Key.S:
+                    moveDirection = -Camera.LookDirection;
+                    break;
+                case Key.A:
+                    moveDirection = -Vector3D.CrossProduct(Camera.LookDirection, Camera.UpDirection);
+                    break;
+                case Key.D:
+                    moveDirection = Vector3D.CrossProduct(Camera.LookDirection, Camera.UpDirection);
+                    break;
+            }
+
+            if (moveDirection.Length > 0)
+            {
+                moveDirection.Normalize();
+                Camera.Position += moveRate * moveDirection;
+            }
+        }
+
         private void UpdateCameraDirection()
         {
             // Исходное направление камеры (можно изменить на начальное состояние камеры)
@@ -143,53 +156,9 @@ namespace PlanetSimulationCW.ViewModel
             //Log = lookDirection.ToString() + " / " + upDirection.ToString();
         }
 
-
-        private RelayCommand<KeyEventArgs>? keyDownCommand;
-        public RelayCommand<MouseButtonEventArgs> MouseRightButtonDownCommand { get; private set; }
-        public RelayCommand<MouseEventArgs> MouseMoveCommand { get; private set; }
-        public RelayCommand<MouseButtonEventArgs> MouseRightButtonUpCommand { get; private set; }
-        public RelayCommand<KeyEventArgs> KeyDownCommand
+        private void Update(object? sender, EventArgs e)
         {
-            get
-            {
-                return keyDownCommand ??
-                  (keyDownCommand = new RelayCommand<KeyEventArgs>(e =>
-                  {
-                      const float moveRate = 10;
-                      const float rotationSensitivity = 0.05f;
-                      Vector3D rotation = new Vector3D();
-                      Vector3D moveDirection = new Vector3D();
-
-                      switch (e.Key)
-                      {
-                          case Key.W:
-                              moveDirection = Camera.LookDirection;
-                              break;
-                          case Key.S:
-                              moveDirection = -Camera.LookDirection;
-                              break;
-                          case Key.A:
-                              moveDirection = -Vector3D.CrossProduct(Camera.LookDirection, Camera.UpDirection);
-                              break;
-                          case Key.D:
-                              moveDirection = Vector3D.CrossProduct(Camera.LookDirection, Camera.UpDirection);
-                              break;
-                      }
-
-                      if (moveDirection.Length > 0)
-                      {
-                          moveDirection.Normalize();
-                          Camera.Position += moveRate * moveDirection;
-                      }
-                  }));
-            }
-        }
-
-        private void Render(object? sender, EventArgs e) // Отрисовка кадра симуляции
-        {
-            frame++;
-
-            ModelGroup = CreateModelGroup(simulation.planets); // Обновление модели в представлении
+            ModelGroup = CreateModelGroup(simulation.planets); // Отрисовка планет во View
 
             simulation.SimulateStep();
         }

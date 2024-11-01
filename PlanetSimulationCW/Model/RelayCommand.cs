@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace PlanetSimulationCW
+namespace PlanetSimulationCW.Model
 {
     public class RelayCommand : ICommand
     {
