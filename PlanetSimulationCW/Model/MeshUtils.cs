@@ -3,7 +3,7 @@ using System.Windows.Media.Media3D;
 
 namespace PlanetSimulationCW
 {
-    class MeshUtils
+    static class MeshUtils
     {
         public static MeshGeometry3D CreatePlanetGeometry()
         {

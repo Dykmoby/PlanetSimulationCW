@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
+using System.Diagnostics;
 
 namespace PlanetSimulationCW.ViewModel
 {
@@ -11,10 +12,15 @@ namespace PlanetSimulationCW.ViewModel
         private Point prevMousePos;
         private Quaternion cameraRotation = Quaternion.Identity;
         private double rotationSpeed = 5;
-        const float moveRate = 10;
+        const float moveSpeedMin = 1;
+        const float moveSpeedMax = 20;
+        const float moveSpeedMaxTime = 3000; // Через сколько миллисекунд достигается максимальная скорость перемещения камеры (с зажатой клавишой перемещения)
         const float rotationSensitivity = 0.05f;
         private List<Key> pressedKeys = new List<Key>();
         private bool rightMouseDown = false;
+        private readonly Key[] movementKeys = { Key.W, Key.A, Key.S, Key.D };
+
+        private Stopwatch movementStopwatch = new Stopwatch();
 
         Simulation simulation;
 
@@ -117,6 +123,7 @@ namespace PlanetSimulationCW.ViewModel
         {
             if (!pressedKeys.Contains(e.Key))
             {
+                TrySetMovementStopwatch(e.Key);
                 pressedKeys.Add(e.Key);
             }
         }
@@ -125,7 +132,28 @@ namespace PlanetSimulationCW.ViewModel
         {
             if (pressedKeys.Contains(e.Key))
             {
+                TryResetMovementStopwatch(e.Key);
                 pressedKeys.Remove(e.Key);
+            }
+        }
+
+        // Запускает таймер (movementStopwatch), который влияет на плавное увеличение скорости перемещения камеры, если клавиши перемещения зажаты
+        private void TrySetMovementStopwatch(Key key)
+        {
+            // Если любая из двигающих камеру клавиш нажата впервые
+            if (pressedKeys.Intersect(movementKeys).Any() == false && movementKeys.Contains(key))
+            {
+                movementStopwatch = Stopwatch.StartNew();
+            }
+        }
+
+        // Останавливает movementStopwatch, если была отжата последняя клавиша перемещения камеры
+        private void TryResetMovementStopwatch(Key key)
+        {
+            // Если любая из двигающих камеру клавиш была отжата, и больше никакие клавиши перемещения не нажаты
+            if (pressedKeys.Intersect(movementKeys).ToArray().Length == 1 && movementKeys.Contains(key))
+            {
+                movementStopwatch.Stop();
             }
         }
 
@@ -147,7 +175,10 @@ namespace PlanetSimulationCW.ViewModel
         private void Update(object? sender, EventArgs e)
         {
             MoveCamera();
-            ModelGroup = CreateModelGroup(simulation.planets); // Отрисовка планет во View
+
+            // Отрисовка планет во View
+            ModelGroup = CreateModelGroup(simulation.planets);
+
             simulation.SimulateStep();
         }
 
@@ -182,7 +213,8 @@ namespace PlanetSimulationCW.ViewModel
             if (moveDirection.Length > 0)
             {
                 moveDirection.Normalize();
-                Camera.Position += moveRate * moveDirection;
+                Log = MathUtils.Linear(0, moveSpeedMaxTime, movementStopwatch.ElapsedMilliseconds, moveSpeedMin, moveSpeedMax).ToString();
+                Camera.Position += MathUtils.Linear(0, moveSpeedMaxTime, movementStopwatch.ElapsedMilliseconds, moveSpeedMin, moveSpeedMax) * moveDirection;
             }
         }
 
