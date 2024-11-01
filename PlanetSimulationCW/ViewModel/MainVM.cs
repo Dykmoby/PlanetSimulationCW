@@ -9,8 +9,12 @@ namespace PlanetSimulationCW.ViewModel
     class MainVM : Property
     {
         private Point prevMousePos;
-        private Quaternion rotation = Quaternion.Identity;
+        private Quaternion cameraRotation = Quaternion.Identity;
         private double rotationSpeed = 5;
+        const float moveRate = 10;
+        const float rotationSensitivity = 0.05f;
+        private List<Key> pressedKeys = new List<Key>();
+        private bool rightMouseDown = false;
 
         Simulation simulation;
 
@@ -52,6 +56,7 @@ namespace PlanetSimulationCW.ViewModel
         public RelayCommand<MouseEventArgs> MouseMoveCommand { get; private set; }
         public RelayCommand<MouseButtonEventArgs> MouseRightButtonUpCommand { get; private set; }
         public RelayCommand<KeyEventArgs> KeyDownCommand { get; private set; }
+        public RelayCommand<KeyEventArgs> KeyUpCommand { get; private set; }
 
         public MainVM()
         {
@@ -71,36 +76,33 @@ namespace PlanetSimulationCW.ViewModel
             MouseMoveCommand = new RelayCommand<MouseEventArgs>(OnMouseMove);
             MouseRightButtonUpCommand = new RelayCommand<MouseButtonEventArgs>(OnMouseRightButtonUp);
             KeyDownCommand = new RelayCommand<KeyEventArgs>(OnKeyDown);
+            KeyUpCommand = new RelayCommand<KeyEventArgs>(OnKeyUp);
         }
 
         private void OnMouseRightButtonDown(MouseButtonEventArgs e)
         {
             Mouse.Capture((UIElement)e.Source);
             prevMousePos = e.GetPosition((UIElement)e.Source);
+            rightMouseDown = true;
         }
 
         private void OnMouseMove(MouseEventArgs e)
         {
-            if (e.RightButton == MouseButtonState.Pressed)
+            if (rightMouseDown == true)
             {
                 Point currentMousePos = e.GetPosition((UIElement)e.Source);
 
-                // Вычисляем изменения по осям
                 double deltaX = currentMousePos.X - prevMousePos.X;
                 double deltaY = currentMousePos.Y - prevMousePos.Y;
 
-                // Создаем кватернионы для поворотов по осям X и Y
                 Quaternion horizontalRotation = new Quaternion(new Vector3D(0, -1, 0), deltaX / rotationSpeed);
                 Quaternion verticalRotation = new Quaternion(new Vector3D(-1, 0, 0), deltaY / rotationSpeed);
 
-                // Накапливаем общий поворот
-                rotation *= horizontalRotation * verticalRotation;
-                rotation.Normalize();
+                cameraRotation *= horizontalRotation * verticalRotation;
+                cameraRotation.Normalize();
 
-                // Обновляем направление камеры
                 UpdateCameraDirection();
 
-                // Обновляем предыдущее положение мыши
                 prevMousePos = currentMousePos;
             }
         }
@@ -108,35 +110,22 @@ namespace PlanetSimulationCW.ViewModel
         private void OnMouseRightButtonUp(MouseButtonEventArgs e)
         {
             Mouse.Capture(null);
+            rightMouseDown = false;
         }
 
         private void OnKeyDown(KeyEventArgs e)
         {
-            const float moveRate = 10;
-            const float rotationSensitivity = 0.05f;
-            Vector3D rotation = new Vector3D();
-            Vector3D moveDirection = new Vector3D();
-
-            switch (e.Key)
+            if (!pressedKeys.Contains(e.Key))
             {
-                case Key.W:
-                    moveDirection = Camera.LookDirection;
-                    break;
-                case Key.S:
-                    moveDirection = -Camera.LookDirection;
-                    break;
-                case Key.A:
-                    moveDirection = -Vector3D.CrossProduct(Camera.LookDirection, Camera.UpDirection);
-                    break;
-                case Key.D:
-                    moveDirection = Vector3D.CrossProduct(Camera.LookDirection, Camera.UpDirection);
-                    break;
+                pressedKeys.Add(e.Key);
             }
+        }
 
-            if (moveDirection.Length > 0)
+        private void OnKeyUp(KeyEventArgs e)
+        {
+            if (pressedKeys.Contains(e.Key))
             {
-                moveDirection.Normalize();
-                Camera.Position += moveRate * moveDirection;
+                pressedKeys.Remove(e.Key);
             }
         }
 
@@ -146,9 +135,8 @@ namespace PlanetSimulationCW.ViewModel
             Vector3D initialLookDirection = new Vector3D(0, 0, -1);
             Vector3D initialUpDirection = new Vector3D(0, 1, 0);
 
-            // Применяем текущий кватернион поворота к вектору направления и вертикали
-            Vector3D lookDirection = rotation.Rotate(initialLookDirection, rotationSpeed);
-            Vector3D upDirection = rotation.Rotate(initialUpDirection, rotationSpeed);
+            Vector3D lookDirection = cameraRotation.Rotate(initialLookDirection, rotationSpeed);
+            Vector3D upDirection = cameraRotation.Rotate(initialUpDirection, rotationSpeed);
 
             Camera.LookDirection = lookDirection;
             Camera.UpDirection = upDirection;
@@ -158,9 +146,44 @@ namespace PlanetSimulationCW.ViewModel
 
         private void Update(object? sender, EventArgs e)
         {
+            MoveCamera();
             ModelGroup = CreateModelGroup(simulation.planets); // Отрисовка планет во View
-
             simulation.SimulateStep();
+        }
+
+        private void MoveCamera()
+        {
+            Vector3D moveDirection = new Vector3D();
+
+            if (pressedKeys.Contains(Key.W))
+            {
+                moveDirection = Camera.LookDirection;
+                moveDirection.Normalize();
+            }
+            else if (pressedKeys.Contains(Key.S))
+            {
+                moveDirection = -Camera.LookDirection;
+                moveDirection.Normalize();
+            }
+
+            if (pressedKeys.Contains(Key.A))
+            {
+                Vector3D leftDirection = -Vector3D.CrossProduct(Camera.LookDirection, Camera.UpDirection);
+                leftDirection.Normalize();
+                moveDirection += leftDirection;
+            }
+            else if (pressedKeys.Contains(Key.D))
+            {
+                Vector3D rightDirection = Vector3D.CrossProduct(Camera.LookDirection, Camera.UpDirection);
+                rightDirection.Normalize();
+                moveDirection += rightDirection;
+            }
+
+            if (moveDirection.Length > 0)
+            {
+                moveDirection.Normalize();
+                Camera.Position += moveRate * moveDirection;
+            }
         }
 
         private Model3DGroup CreateModelGroup(List<Planet> planets)

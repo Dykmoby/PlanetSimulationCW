@@ -13,6 +13,9 @@
         <i:EventTrigger EventName="KeyDown">
             <local:KeyEventArgsCommandAction Command="{Binding KeyDownCommand}"/>
         </i:EventTrigger>
+        <i:EventTrigger EventName="KeyUp">
+            <local:KeyEventArgsCommandAction Command="{Binding KeyUpCommand}"/>
+        </i:EventTrigger>
         <i:EventTrigger EventName="MouseRightButtonDown">
             <local:MouseButtonEventArgsCommandAction Command="{Binding MouseRightButtonDownCommand}"/>
         </i:EventTrigger>
