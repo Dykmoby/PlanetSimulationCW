@@ -10,11 +10,11 @@ namespace PlanetSimulationCW
             return CreateSphereMesh(1, 8, 8);
         }
 
-        public static GeometryModel3D CreatePlanetGeometryModel()
+        public static GeometryModel3D CreatePlanetGeometryModel(Color planetColor)
         {
             MeshGeometry3D planetMesh = CreatePlanetGeometry();
 
-            Material material = new DiffuseMaterial(new SolidColorBrush(Colors.White));
+            Material material = new DiffuseMaterial(new SolidColorBrush(planetColor));
             GeometryModel3D planetModel = new GeometryModel3D(planetMesh, material);
 
             return planetModel;

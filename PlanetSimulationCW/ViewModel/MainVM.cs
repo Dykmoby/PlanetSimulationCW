@@ -1,9 +1,9 @@
 ﻿using PlanetSimulationCW.Model;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
-using System.Diagnostics;
 
 namespace PlanetSimulationCW.ViewModel
 {
@@ -66,7 +66,7 @@ namespace PlanetSimulationCW.ViewModel
 
         public MainVM()
         {
-            simulation = new Simulation(100);
+            simulation = new Simulation(50);
 
             Camera = new PerspectiveCamera();
             Camera.Position = new Point3D(100, 100, 300);
@@ -224,8 +224,9 @@ namespace PlanetSimulationCW.ViewModel
 
             foreach (Planet planet in planets)
             {
-                GeometryModel3D geometryModel = MeshUtils.CreatePlanetGeometryModel();
+                GeometryModel3D geometryModel = MeshUtils.CreatePlanetGeometryModel(planet.Color);
                 Transform3DGroup transformGroup = new Transform3DGroup();
+                transformGroup.Children.Add(new ScaleTransform3D(planet.Radius, planet.Radius, planet.Radius));
                 transformGroup.Children.Add(new TranslateTransform3D(planet.Position.X, planet.Position.Y, planet.Position.Z));
                 geometryModel.Transform = transformGroup;
 

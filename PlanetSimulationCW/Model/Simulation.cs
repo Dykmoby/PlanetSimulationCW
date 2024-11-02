@@ -1,4 +1,6 @@
-﻿using System.Numerics;
+﻿using System.Windows.Media;
+using System.Numerics;
+using System.Windows;
 
 namespace PlanetSimulationCW.Model
 {
@@ -19,10 +21,12 @@ namespace PlanetSimulationCW.Model
             for (int i = 0; i < planetCount; i++)
             {
                 Vector3 planetPosition = new Vector3(rand.Next(0, 200), rand.Next(0, 200), rand.Next(0, 200));
-                float planetRadius = rand.Next(10, 40) / 10.0f;
-                float planetMass = (float) (Math.PI * planetRadius * planetRadius);
+                float planetRadius = rand.Next(10, 50) / 10.0f;
+                float planetMass = (float)(4 / 3 * Math.PI * Math.Pow(planetRadius, 3));
+                //Color color = Color.FromArgb(255, (byte)rand.Next(0, 255), (byte)rand.Next(0, 255), (byte)rand.Next(0, 255));
+                Color color = Color.FromArgb(255, 255, 255, 255);
 
-                planets.Add(new Planet(planetPosition, planetMass, planetRadius));
+                planets.Add(new Planet(planetPosition, planetMass, planetRadius, color));
             }
         }
 
@@ -72,6 +76,14 @@ namespace PlanetSimulationCW.Model
                     {
                         planets[i].SetVelocity(direction * (SPEED_OF_LIGHT - 100));
                     }
+                }
+            }
+
+            for (int i = 0; i < planets.Count; i++)
+            {
+                if (planets[i].Destroyed == true)
+                {
+                    planets.RemoveAt(i);
                 }
             }
 
