@@ -18,7 +18,7 @@ namespace PlanetSimulationCW.ViewModel
         const float rotationSensitivity = 0.05f;
         private List<Key> pressedKeys = new List<Key>();
         private bool rightMouseDown = false;
-        private readonly Key[] movementKeys = { Key.W, Key.A, Key.S, Key.D };
+        private readonly Key[] movementKeys = { Key.W, Key.A, Key.S, Key.D, Key.Q, Key.E };
 
         private Stopwatch movementStopwatch = new Stopwatch();
 
@@ -208,6 +208,17 @@ namespace PlanetSimulationCW.ViewModel
                 Vector3D rightDirection = Vector3D.CrossProduct(Camera.LookDirection, Camera.UpDirection);
                 rightDirection.Normalize();
                 moveDirection += rightDirection;
+            }
+
+            if (pressedKeys.Contains(Key.Q))
+            {
+                moveDirection = -Camera.UpDirection;
+                moveDirection.Normalize();
+            }
+            else if (pressedKeys.Contains(Key.E))
+            {
+                moveDirection = Camera.UpDirection;
+                moveDirection.Normalize();
             }
 
             if (moveDirection.Length > 0)
