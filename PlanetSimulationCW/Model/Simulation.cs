@@ -1,6 +1,7 @@
 ﻿using System.Windows.Media;
 using System.Numerics;
 using System.Windows;
+using System.Windows.Media.Media3D;
 
 namespace PlanetSimulationCW.Model
 {
@@ -9,25 +10,31 @@ namespace PlanetSimulationCW.Model
         const double G = 6.6743015E-11F;
         const int SPEED_OF_LIGHT = 299792458;
         public List<Planet> planets;
+        public Octree octree;
+        private double octreeMaxSize = 1000;
 
         // Время между кадрами (влияет на скорость симуляции). Пусть это будет постоянным значением пока что.
         private float deltaTime = 0.16f;
 
         public Simulation(int planetCount)
         {
+            octree = new Octree(new Point3D(0, 0, 0), octreeMaxSize);
             planets = new List<Planet>();
             Random rand = new Random();
 
             for (int i = 0; i < planetCount; i++)
             {
-                Vector3 planetPosition = new Vector3(rand.Next(0, 200), rand.Next(0, 200), rand.Next(0, 200));
+                Vector3 planetPosition = new Vector3(rand.Next(-200, 200), rand.Next(-200, 200), rand.Next(-200, 200));
                 float planetRadius = rand.Next(10, 50) / 10.0f;
                 float planetMass = (float)(4 / 3 * Math.PI * Math.Pow(planetRadius, 3));
                 //Color color = Color.FromArgb(255, (byte)rand.Next(0, 255), (byte)rand.Next(0, 255), (byte)rand.Next(0, 255));
                 Color color = Color.FromArgb(255, 255, 255, 255);
 
                 planets.Add(new Planet(planetPosition, planetMass, planetRadius, color));
+                octree.Insert(new Planet(planetPosition, planetMass, planetRadius, color));
             }
+
+            planets = octree.GetAllPlanets();
         }
 
         public void SimulateStep()
@@ -83,7 +90,8 @@ namespace PlanetSimulationCW.Model
             {
                 if (planets[i].Destroyed == true)
                 {
-                    planets.RemoveAt(i);
+                    octree.RemovePlanet(planets[i]);
+                    //planets.RemoveAt(i);
                 }
             }
 
@@ -91,6 +99,9 @@ namespace PlanetSimulationCW.Model
             {
                 planets[i].Move(deltaTimeSquared);
             }
+
+            planets = octree.GetAllPlanets();
+            octree.UpdateOctants();
         }
     }
 }

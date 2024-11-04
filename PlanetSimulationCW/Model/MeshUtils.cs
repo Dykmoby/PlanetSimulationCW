@@ -20,6 +20,18 @@ namespace PlanetSimulationCW
             return planetModel;
         }
 
+        public static GeometryModel3D CreateOctantGeometryModel()
+        {
+            MeshGeometry3D octantMesh = new MeshGeometry3D();
+            AddCube(octantMesh);
+            //Random rand = new Random();
+            Color color = Color.FromArgb(10, 180, 180, 255);
+            Material material = new DiffuseMaterial(new SolidColorBrush(color));
+            GeometryModel3D octantModel = new GeometryModel3D(octantMesh, material);
+
+            return octantModel;
+        }
+
         public static void AddTriangle(MeshGeometry3D mesh, Point3D point1, Point3D point2, Point3D point3)
         {
             int i = mesh.Positions.Count;
@@ -31,6 +43,47 @@ namespace PlanetSimulationCW
             mesh.TriangleIndices.Add(i++);
             mesh.TriangleIndices.Add(i++);
             mesh.TriangleIndices.Add(i);
+        }
+
+        public static void AddCube(MeshGeometry3D mesh, double size = 1.0)
+        {
+            double half = size / 2.0;
+
+            Point3D[] points =
+            [
+                new Point3D(-half, -half, -half),
+                new Point3D(half, -half, -half),
+                new Point3D(half, half, -half),
+                new Point3D(-half, half, -half),
+                new Point3D(-half, -half, half),
+                new Point3D(half, -half, half),
+                new Point3D(half, half, half),
+                new Point3D(-half, half, half)
+            ];
+
+            // Передняя грань
+            AddTriangle(mesh, points[0], points[1], points[2]);
+            AddTriangle(mesh, points[0], points[2], points[3]);
+
+            // Задняя грань
+            AddTriangle(mesh, points[4], points[6], points[5]);
+            AddTriangle(mesh, points[4], points[7], points[6]);
+
+            // Левая грань
+            AddTriangle(mesh, points[0], points[3], points[7]);
+            AddTriangle(mesh, points[0], points[7], points[4]);
+
+            // Правая грань
+            AddTriangle(mesh, points[1], points[5], points[6]);
+            AddTriangle(mesh, points[1], points[6], points[2]);
+
+            // Нижняя грань
+            AddTriangle(mesh, points[0], points[4], points[5]);
+            AddTriangle(mesh, points[0], points[5], points[1]);
+
+            // Верхняя грань
+            AddTriangle(mesh, points[3], points[2], points[6]);
+            AddTriangle(mesh, points[3], points[6], points[7]);
         }
 
         public static MeshGeometry3D CreateSphereMesh(double radius, int rowCount, int columnCount)

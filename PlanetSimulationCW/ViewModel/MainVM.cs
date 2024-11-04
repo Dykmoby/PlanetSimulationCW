@@ -69,7 +69,7 @@ namespace PlanetSimulationCW.ViewModel
             simulation = new Simulation(50);
 
             Camera = new PerspectiveCamera();
-            Camera.Position = new Point3D(100, 100, 300);
+            Camera.Position = new Point3D(0, 0, 300);
             Camera.LookDirection = new Vector3D(0, 0, -1);
             Camera.UpDirection = new Vector3D(0, 1, 0);
 
@@ -177,7 +177,7 @@ namespace PlanetSimulationCW.ViewModel
             MoveCamera();
 
             // Отрисовка планет во View
-            ModelGroup = CreateModelGroup(simulation.planets);
+            ModelGroup = CreateModelGroup(simulation.planets, simulation.octree);
 
             simulation.SimulateStep();
         }
@@ -229,7 +229,7 @@ namespace PlanetSimulationCW.ViewModel
             }
         }
 
-        private Model3DGroup CreateModelGroup(List<Planet> planets)
+        private Model3DGroup CreateModelGroup(List<Planet> planets, Octree octree)
         {
             Model3DGroup modelGroup = new Model3DGroup();
 
@@ -239,6 +239,20 @@ namespace PlanetSimulationCW.ViewModel
                 Transform3DGroup transformGroup = new Transform3DGroup();
                 transformGroup.Children.Add(new ScaleTransform3D(planet.Radius, planet.Radius, planet.Radius));
                 transformGroup.Children.Add(new TranslateTransform3D(planet.Position.X, planet.Position.Y, planet.Position.Z));
+                geometryModel.Transform = transformGroup;
+
+                modelGroup.Children.Add(geometryModel);
+            }
+
+            foreach (Octree.Node node in octree.GetAllNodes())
+            {
+                if (node == octree.Root)
+                    continue;
+
+                GeometryModel3D geometryModel = MeshUtils.CreateOctantGeometryModel();
+                Transform3DGroup transformGroup = new Transform3DGroup();
+                transformGroup.Children.Add(new ScaleTransform3D(node.size * 2, node.size * 2, node.size * 2));
+                transformGroup.Children.Add(new TranslateTransform3D(node.center.X, node.center.Y, node.center.Z));
                 geometryModel.Transform = transformGroup;
 
                 modelGroup.Children.Add(geometryModel);
