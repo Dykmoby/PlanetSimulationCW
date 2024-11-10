@@ -27,8 +27,8 @@ namespace PlanetSimulationCW.Model
                 Vector3 planetPosition = new Vector3(rand.Next(-200, 200), rand.Next(-200, 200), rand.Next(-200, 200));
                 float planetRadius = rand.Next(10, 50) / 10.0f;
                 float planetMass = (float)(4 / 3 * Math.PI * Math.Pow(planetRadius, 3));
-                //Color color = Color.FromArgb(255, (byte)rand.Next(0, 255), (byte)rand.Next(0, 255), (byte)rand.Next(0, 255));
-                Color color = Color.FromArgb(255, 255, 255, 255);
+                Color color = Color.FromArgb(255, (byte)rand.Next(0, 255), (byte)rand.Next(0, 255), (byte)rand.Next(0, 255));
+                //Color color = Color.FromArgb(255, 255, 255, 255);
 
                 planets.Add(new Planet(planetPosition, planetMass, planetRadius, color));
                 octree.Insert(new Planet(planetPosition, planetMass, planetRadius, color));
@@ -75,13 +75,13 @@ namespace PlanetSimulationCW.Model
                     float invDistanceSqr = 1.0f / distanceSqr;
                     Vector3 direction = Vector3.Normalize(delta);
 
-                    float velocity = (float)(1000000000 * G * planets[k].Mass * invDistanceSqr);
+                    float acceleration = (float)(5000000000 * G * planets[k].Mass * invDistanceSqr);
 
-                    planets[i].AddVelocity(direction * velocity);
+                    planets[i].AddAcceleration(direction * acceleration);
 
-                    if (planets[i].Velocity.Length() >= SPEED_OF_LIGHT)
+                    if (planets[i].Acceleration.Length() >= SPEED_OF_LIGHT)
                     {
-                        planets[i].SetVelocity(direction * (SPEED_OF_LIGHT - 100));
+                        planets[i].SetAcceleration(direction * (SPEED_OF_LIGHT - 100));
                     }
                 }
             }
