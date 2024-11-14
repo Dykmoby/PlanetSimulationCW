@@ -84,7 +84,7 @@ namespace PlanetSimulationCW.Model
                 foreach (Node child in children)
                 {
                     if (child == null) continue;
-                    force = force + child.GetForce(planet, theta);
+                    force += child.GetForce(planet, theta);
                 }
 
                 return force;
@@ -98,23 +98,17 @@ namespace PlanetSimulationCW.Model
 
                 public void AddParticle(Planet planet)
                 {
-                    Vector3D centerOfMassTemp = new Vector3D(centerOfMass.X * mass + planet.Position.X * planet.Mass,
-                                                         centerOfMass.Y * mass + planet.Position.Y * planet.Mass,
-                                                         centerOfMass.Z * mass + planet.Position.Z * planet.Mass);
+                    Vector3D centerOfMassTemp = centerOfMass * mass + planet.Position * planet.Mass;
                     mass += planet.Mass;
                     centerOfMass = centerOfMassTemp / mass;
                 }
 
                 public Vector3D CalculateForce(Planet planet)
                 {
-                    Vector3D planetPosition = new Vector3D(planet.Position.X, planet.Position.Y, planet.Position.Z);
-                    double distance = (centerOfMass - planetPosition).Length;
+                    double distance = (centerOfMass - planet.Position).Length;
                     double product = 100000000 * Simulation.G * mass * planet.Mass / (distance * distance);
 
-                    Vector3D answ = (centerOfMass - planetPosition) * product;
-
-                    //return new Vector3D();
-                    return new Vector3D(answ.X, answ.Y, answ.Z);
+                    return (centerOfMass - planet.Position) * product;
                 }
             }
         }

@@ -265,14 +265,5 @@ namespace PlanetSimulationCW.ViewModel
 
             return modelGroup;
         }
-
-        private bool CheckIfPointInBounds(double x, double y, int xMax, int yMax)
-        {
-            if (x < 0 || y < 0 || x >= xMax || y >= yMax)
-            {
-                return false;
-            }
-            return true;
-        }
     }
 }
