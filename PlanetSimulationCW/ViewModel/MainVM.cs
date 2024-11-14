@@ -20,8 +20,6 @@ namespace PlanetSimulationCW.ViewModel
         private bool rightMouseDown = false;
         private readonly Key[] movementKeys = { Key.W, Key.A, Key.S, Key.D, Key.Q, Key.E };
         private bool renderOctants = false;
-        private double maxDistanceLod = 100;
-        private int maxLod = 8;
 
         private Stopwatch movementStopwatch = new Stopwatch();
 
@@ -239,10 +237,8 @@ namespace PlanetSimulationCW.ViewModel
 
             foreach (Planet planet in planets) // Отрисовка планет
             {
-                int lod = (int) (((planet.Position - (Vector3D)Camera.Position).Length) / 100);
-                lod = (int)Math.Clamp(lod, 0, maxDistanceLod);
-                lod = (int)((maxDistanceLod - lod) / maxDistanceLod * maxLod);
-                if (lod < 2) continue;
+                int lod = GetLODByDistance(planet);
+                if (lod == 0) continue;
                 GeometryModel3D geometryModel = MeshUtils.CreatePlanetGeometryModel(planet.Color, lod);
                 //GeometryModel3D geometryModel = MeshUtils.CreatePlanetGeometryModel(planet.Color);
                 Transform3DGroup transformGroup = new Transform3DGroup();
@@ -271,6 +267,38 @@ namespace PlanetSimulationCW.ViewModel
             }
 
             return modelGroup;
+        }
+
+        // Получить LOD в зависимости от расстояния между камерой и планетой
+        private int GetLODByDistance(Planet planet)
+        {
+            double distance = (planet.Position - (Vector3D)Camera.Position).Length;
+            if (distance >= 0 && distance < 100) // LOD 0
+            {
+                return 12;
+            }
+            else if (distance >= 100 && distance < 300) // LOD 1
+            {
+                return 8;
+            }
+            else if (distance >= 300 && distance < 1000) // LOD 2
+            {
+                return 5;
+            }
+            else if (distance >= 1000 && distance < 3000) // LOD 3
+            {
+                return 3;
+            }
+            else if(distance >= 3000 && distance < 50000) // LOD 4
+            {
+                return 2;
+            }
+            else if(distance >= 50000) // LOD 5 (NO RENDER)
+            {
+                return 0; // Не рендерить планету
+            }
+
+            return 0; // Не рендерить планету
         }
     }
 }
