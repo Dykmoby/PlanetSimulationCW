@@ -19,6 +19,7 @@ namespace PlanetSimulationCW.ViewModel
         private List<Key> pressedKeys = new List<Key>();
         private bool rightMouseDown = false;
         private readonly Key[] movementKeys = { Key.W, Key.A, Key.S, Key.D, Key.Q, Key.E };
+        private bool renderOctants = false;
 
         private Stopwatch movementStopwatch = new Stopwatch();
 
@@ -66,7 +67,7 @@ namespace PlanetSimulationCW.ViewModel
 
         public MainVM()
         {
-            simulation = new Simulation(50);
+            simulation = new Simulation(200);
 
             Camera = new PerspectiveCamera();
             Camera.Position = new Point3D(0, 0, 300);
@@ -217,6 +218,7 @@ namespace PlanetSimulationCW.ViewModel
             }
             else if (pressedKeys.Contains(Key.E))
             {
+                Console.WriteLine(simulation.planets.Capacity);
                 moveDirection = Camera.UpDirection;
                 moveDirection.Normalize();
             }
@@ -233,7 +235,7 @@ namespace PlanetSimulationCW.ViewModel
         {
             Model3DGroup modelGroup = new Model3DGroup();
 
-            foreach (Planet planet in planets)
+            foreach (Planet planet in planets) // Отрисовка планет
             {
                 GeometryModel3D geometryModel = MeshUtils.CreatePlanetGeometryModel(planet.Color);
                 Transform3DGroup transformGroup = new Transform3DGroup();
@@ -244,18 +246,21 @@ namespace PlanetSimulationCW.ViewModel
                 modelGroup.Children.Add(geometryModel);
             }
 
-            foreach (Octree.Node node in octree.GetAllNodes())
+            if (renderOctants)
             {
-                if (node == octree.Root)
-                    continue;
+                foreach (Octree.Node node in octree.GetAllNodes()) // Отрисовка октантов
+                {
+                    if (node == octree.Root)
+                        continue;
 
-                GeometryModel3D geometryModel = MeshUtils.CreateOctantGeometryModel();
-                Transform3DGroup transformGroup = new Transform3DGroup();
-                transformGroup.Children.Add(new ScaleTransform3D(node.size * 2, node.size * 2, node.size * 2));
-                transformGroup.Children.Add(new TranslateTransform3D(node.center.X, node.center.Y, node.center.Z));
-                geometryModel.Transform = transformGroup;
+                    GeometryModel3D geometryModel = MeshUtils.CreateOctantGeometryModel();
+                    Transform3DGroup transformGroup = new Transform3DGroup();
+                    transformGroup.Children.Add(new ScaleTransform3D(node.size * 2, node.size * 2, node.size * 2));
+                    transformGroup.Children.Add(new TranslateTransform3D(node.center.X, node.center.Y, node.center.Z));
+                    geometryModel.Transform = transformGroup;
 
-                modelGroup.Children.Add(geometryModel);
+                    modelGroup.Children.Add(geometryModel);
+                }
             }
 
             return modelGroup;

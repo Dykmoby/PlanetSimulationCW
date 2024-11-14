@@ -6,7 +6,7 @@ namespace PlanetSimulationCW.Model
     class Planet
     {
         public Vector3 Position { get; private set; }
-        public Vector3 Acceleration { get; private set; }
+        public Vector3 Velocity { get; private set; }
         public float Mass { get; private set; }
         public float Radius { get; private set; }
         public Color Color { get; private set; }
@@ -18,7 +18,7 @@ namespace PlanetSimulationCW.Model
             Position = position;
             Mass = mass;
             Radius = radius;
-            Acceleration = new Vector3(0, 0, 0);
+            Velocity = new Vector3(0, 0, 0);
             Color = color;
         }
 
@@ -29,23 +29,23 @@ namespace PlanetSimulationCW.Model
             // Объем планеты после столкновения
             float V = (float)(4d / 3d * Math.PI * Math.Pow(Radius, 3) + 4d / 3d * Math.PI * Math.Pow(otherPlanet.Radius, 3));
             Radius = (float)Math.Pow(3d / 4d * V / Math.PI, 1d / 3d);
-            Acceleration = Acceleration + otherPlanet.Acceleration * otherPlanet.Mass / Mass;
+            Velocity = Velocity + otherPlanet.Velocity * otherPlanet.Mass / Mass;
             otherPlanet.Destroyed = true;
         }
 
-        public void AddAcceleration(Vector3 addAcceleration)
+        public void AddVelocity(Vector3 addVelocity)
         {
-            Acceleration += addAcceleration;
+            Velocity += addVelocity;
         }
 
-        public void SetAcceleration(Vector3 setAcceleration)
+        public void SetVelocity(Vector3 setVelocity)
         {
-            Acceleration = setAcceleration;
+            Velocity = setVelocity;
         }
 
-        public void Move(float deltaTimeSquared)
+        public void Move(float deltaTime)
         {
-            Position += Acceleration * deltaTimeSquared;
+            Position += Velocity * deltaTime;
         }
     }
 }
