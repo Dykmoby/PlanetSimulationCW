@@ -5,14 +5,14 @@ namespace PlanetSimulationCW
 {
     static class MeshUtils
     {
-        public static MeshGeometry3D CreatePlanetGeometry()
+        public static MeshGeometry3D CreatePlanetGeometry(int lod)
         {
-            return CreateSphereMesh(1, 8, 8);
+            return CreateSphereMesh(1, lod, (int)(lod * 1.5f + 0.5f));
         }
 
-        public static GeometryModel3D CreatePlanetGeometryModel(Color planetColor)
+        public static GeometryModel3D CreatePlanetGeometryModel(Color planetColor, int lod)
         {
-            MeshGeometry3D planetMesh = CreatePlanetGeometry();
+            MeshGeometry3D planetMesh = CreatePlanetGeometry(lod);
 
             Material material = new DiffuseMaterial(new SolidColorBrush(planetColor));
             GeometryModel3D planetModel = new GeometryModel3D(planetMesh, material);

@@ -13,13 +13,15 @@ namespace PlanetSimulationCW.ViewModel
         private Quaternion cameraRotation = Quaternion.Identity;
         private double rotationSpeed = 5;
         const double moveSpeedMin = 1;
-        const double moveSpeedMax = 20;
+        const double moveSpeedMax = 200;
         const double moveSpeedMaxTime = 3000; // Через сколько миллисекунд достигается максимальная скорость перемещения камеры (с зажатой клавишой перемещения)
         const double rotationSensitivity = 0.05f;
         private List<Key> pressedKeys = new List<Key>();
         private bool rightMouseDown = false;
         private readonly Key[] movementKeys = { Key.W, Key.A, Key.S, Key.D, Key.Q, Key.E };
         private bool renderOctants = false;
+        private double maxDistanceLod = 100;
+        private int maxLod = 8;
 
         private Stopwatch movementStopwatch = new Stopwatch();
 
@@ -237,7 +239,12 @@ namespace PlanetSimulationCW.ViewModel
 
             foreach (Planet planet in planets) // Отрисовка планет
             {
-                GeometryModel3D geometryModel = MeshUtils.CreatePlanetGeometryModel(planet.Color);
+                int lod = (int) (((planet.Position - (Vector3D)Camera.Position).Length) / 100);
+                lod = (int)Math.Clamp(lod, 0, maxDistanceLod);
+                lod = (int)((maxDistanceLod - lod) / maxDistanceLod * maxLod);
+                if (lod < 2) continue;
+                GeometryModel3D geometryModel = MeshUtils.CreatePlanetGeometryModel(planet.Color, lod);
+                //GeometryModel3D geometryModel = MeshUtils.CreatePlanetGeometryModel(planet.Color);
                 Transform3DGroup transformGroup = new Transform3DGroup();
                 transformGroup.Children.Add(new ScaleTransform3D(planet.Radius, planet.Radius, planet.Radius));
                 transformGroup.Children.Add(new TranslateTransform3D(planet.Position.X, planet.Position.Y, planet.Position.Z));

@@ -17,6 +17,7 @@ namespace PlanetSimulationCW.Model
 
         // Время между кадрами (влияет на скорость симуляции). Пусть это будет постоянным значением пока что.
         private double deltaTime = 0.16f;
+        private double simulationSpeedMultiplier = 100000000;
 
         public Simulation(int planetCount)
         {
@@ -42,7 +43,7 @@ namespace PlanetSimulationCW.Model
 
             foreach (Planet planet in planets)
             {
-                Vector3D acceleration = octree.Root.GetForce(planet, THETA) / planet.Mass;
+                Vector3D acceleration = octree.Root.GetForce(planet, THETA) / planet.Mass * simulationSpeedMultiplier;
                 planet.AddVelocity(acceleration * deltaTime);
                 planet.Move(deltaTime);
             }
