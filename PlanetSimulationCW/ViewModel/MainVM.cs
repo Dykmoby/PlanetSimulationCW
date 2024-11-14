@@ -12,10 +12,10 @@ namespace PlanetSimulationCW.ViewModel
         private Point prevMousePos;
         private Quaternion cameraRotation = Quaternion.Identity;
         private double rotationSpeed = 5;
-        const float moveSpeedMin = 1;
-        const float moveSpeedMax = 20;
-        const float moveSpeedMaxTime = 3000; // Через сколько миллисекунд достигается максимальная скорость перемещения камеры (с зажатой клавишой перемещения)
-        const float rotationSensitivity = 0.05f;
+        const double moveSpeedMin = 1;
+        const double moveSpeedMax = 20;
+        const double moveSpeedMaxTime = 3000; // Через сколько миллисекунд достигается максимальная скорость перемещения камеры (с зажатой клавишой перемещения)
+        const double rotationSensitivity = 0.05f;
         private List<Key> pressedKeys = new List<Key>();
         private bool rightMouseDown = false;
         private readonly Key[] movementKeys = { Key.W, Key.A, Key.S, Key.D, Key.Q, Key.E };
@@ -266,7 +266,7 @@ namespace PlanetSimulationCW.ViewModel
             return modelGroup;
         }
 
-        private bool CheckIfPointInBounds(float x, float y, int xMax, int yMax)
+        private bool CheckIfPointInBounds(double x, double y, int xMax, int yMax)
         {
             if (x < 0 || y < 0 || x >= xMax || y >= yMax)
             {

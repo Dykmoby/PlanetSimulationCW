@@ -8,13 +8,13 @@ namespace PlanetSimulationCW.Model
     {
         public class Node
         {
-            public Vector3 center;
-            public float size;
+            public Vector3D center;
+            public double size;
             public Node[] children;
             private PlanetAggregate planetsAggregate;
             private List<Planet> planets;
 
-            public Node(Vector3 center, float size)
+            public Node(Vector3D center, double size)
             {
                 this.center = center;
                 this.size = size;
@@ -36,22 +36,22 @@ namespace PlanetSimulationCW.Model
                 planets.Clear();
             }
 
-            public Vector3 GetForce(Planet planet, float theta)
+            public Vector3D GetForce(Planet planet, double theta)
             {
                 if (IsLeaf)
                 {
-                    Vector3 force = new Vector3();
+                    Vector3D force = new Vector3D();
                     for (int i = 0; i < planets.Count; i++)
                     {
                         if (planets[i] == planet) continue;
                         if (planets[i].Destroyed) continue;
                         if (planet.Destroyed) break;
 
-                        Vector3 delta = planets[i].Position - planet.Position;
-                        Vector3 direction = Vector3.Normalize(delta);
-                        float distanceSqr = Vector3.Dot(delta, delta);
+                        Vector3D direction = planets[i].Position - planet.Position;
+                        double distanceSqr = Vector3D.DotProduct(direction, direction);
+                        direction.Normalize();
 
-                        if (delta.Length() < planets[i].Radius + planet.Radius)
+                        if (distanceSqr < Math.Pow(planets[i].Radius + planet.Radius, 2))
                         {
                             if (planets[i].Mass > planet.Mass)
                             {
@@ -69,7 +69,7 @@ namespace PlanetSimulationCW.Model
                     }
                     return force;
                 }
-                if (size / (center - planet.Position).Length() < theta)
+                if (size / (center - planet.Position).Length < theta)
                 {
                     return planetsAggregate.CalculateForce(planet);
                 }
@@ -77,9 +77,9 @@ namespace PlanetSimulationCW.Model
                 return GetForceFromSubNodes(planet, theta);
             }
 
-            private Vector3 GetForceFromSubNodes(Planet planet, float theta)
+            private Vector3D GetForceFromSubNodes(Planet planet, double theta)
             {
-                Vector3 force = new Vector3();
+                Vector3D force = new Vector3D();
 
                 foreach (Node child in children)
                 {
@@ -105,7 +105,7 @@ namespace PlanetSimulationCW.Model
                     centerOfMass = centerOfMassTemp / mass;
                 }
 
-                public Vector3 CalculateForce(Planet planet)
+                public Vector3D CalculateForce(Planet planet)
                 {
                     Vector3D planetPosition = new Vector3D(planet.Position.X, planet.Position.Y, planet.Position.Z);
                     double distance = (centerOfMass - planetPosition).Length;
@@ -113,8 +113,8 @@ namespace PlanetSimulationCW.Model
 
                     Vector3D answ = (centerOfMass - planetPosition) * product;
 
-                    //return new Vector3();
-                    return new Vector3((float) answ.X, (float) answ.Y, (float) answ.Z);
+                    //return new Vector3D();
+                    return new Vector3D(answ.X, answ.Y, answ.Z);
                 }
             }
         }
@@ -124,7 +124,7 @@ namespace PlanetSimulationCW.Model
 
         private int minSize = 50; // Меньше этого размера пространство не будет подразделяться
 
-        public Octree(Vector3 center, float size)
+        public Octree(Vector3D center, double size)
         {
             root = new Node(center, size);
         }
@@ -152,17 +152,17 @@ namespace PlanetSimulationCW.Model
 
             node.AddPlanet(planet);
 
-            short octant = GetOctant(node.center, new Vector3(planet.Position.X, planet.Position.Y, planet.Position.Z));
+            short octant = GetOctant(node.center, new Vector3D(planet.Position.X, planet.Position.Y, planet.Position.Z));
             if (node.children[octant] == null)
             {
-                float childSize = node.size / 2;
-                Vector3 childCenter = GetChildCenter(node.center, childSize, octant);
+                double childSize = node.size / 2;
+                Vector3D childCenter = GetChildCenter(node.center, childSize, octant);
                 node.children[octant] = new Node(childCenter, childSize);
             }
             Insert(node.children[octant], planet);
         }
 
-        private short GetOctant(Vector3 center, Vector3 point)
+        private short GetOctant(Vector3D center, Vector3D point)
         {
             short octant = 0;
             if (point.X >= center.X) octant |= 1;
@@ -171,12 +171,12 @@ namespace PlanetSimulationCW.Model
             return octant;
         }
 
-        private Vector3 GetChildCenter(Vector3 parentCenter, float offset, short octant)
+        private Vector3D GetChildCenter(Vector3D parentCenter, double offset, short octant)
         {
-            float x = (float)(parentCenter.X + ((octant & 1) == 1 ? offset : -offset));
-            float y = (float)(parentCenter.Y + ((octant & 2) == 2 ? offset : -offset));
-            float z = (float)(parentCenter.Z + ((octant & 4) == 4 ? offset : -offset));
-            return new Vector3(x, y, z);
+            double x = parentCenter.X + ((octant & 1) == 1 ? offset : -offset);
+            double y = parentCenter.Y + ((octant & 2) == 2 ? offset : -offset);
+            double z = parentCenter.Z + ((octant & 4) == 4 ? offset : -offset);
+            return new Vector3D(x, y, z);
         }
 
         public List<Node> GetAllNodes()

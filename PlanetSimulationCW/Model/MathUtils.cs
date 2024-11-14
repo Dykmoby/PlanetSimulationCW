@@ -2,7 +2,7 @@
 {
     static class MathUtils
     {
-        public static float Linear(float argMin, float argMax, float arg, float valMin, float valMax)
+        public static double Linear(double argMin, double argMax, double arg, double valMin, double valMax)
         {
             arg = Math.Clamp(arg, argMin, argMax);
             return valMin + (arg - argMin) / (argMax - argMin) * (valMax - valMin);

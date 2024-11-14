@@ -1,33 +1,34 @@
 ﻿using System.Numerics;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 
 namespace PlanetSimulationCW.Model
 {
     class Simulation
     {
-        public const float G = 6.6743015E-11F;
-        public const float THETA = 0.4f;
+        public const double G = 6.6743015E-11;
+        public const double THETA = 0.4;
         public const int SPEED_OF_LIGHT = 299792458;
         public List<Planet> planets;
         public Octree octree;
-        private float octreeMaxSize = 1000000;
+        private double octreeMaxSize = 1000000;
 
         int frame = 0;
 
         // Время между кадрами (влияет на скорость симуляции). Пусть это будет постоянным значением пока что.
-        private float deltaTime = 0.16f;
+        private double deltaTime = 0.16f;
 
         public Simulation(int planetCount)
         {
-            octree = new Octree(new Vector3(0, 0, 0), octreeMaxSize);
+            octree = new Octree(new Vector3D(0, 0, 0), octreeMaxSize);
             planets = new List<Planet>();
             Random rand = new Random();
 
             for (int i = 0; i < planetCount; i++)
             {
-                Vector3 planetPosition = new Vector3(rand.Next(-2000, 2000), rand.Next(-2000, 2000), rand.Next(-2000, 2000));
-                float planetRadius = rand.Next(10, 50) / 10.0f;
-                float planetMass = (float)(4 / 3 * Math.PI * Math.Pow(planetRadius, 3));
+                Vector3D planetPosition = new Vector3D(rand.Next(-2000, 2000), rand.Next(-2000, 2000), rand.Next(-2000, 2000));
+                double planetRadius = rand.Next(10, 50) / 10.0f;
+                double planetMass = 4 / 3 * Math.PI * Math.Pow(planetRadius, 3);
                 Color color = Color.FromArgb(255, (byte)rand.Next(0, 255), (byte)rand.Next(0, 255), (byte)rand.Next(0, 255));
                 //Color color = Color.FromArgb(255, 255, 255, 255);
 
@@ -41,7 +42,7 @@ namespace PlanetSimulationCW.Model
 
             foreach (Planet planet in planets)
             {
-                Vector3 acceleration = octree.Root.GetForce(planet, THETA) / planet.Mass;
+                Vector3D acceleration = octree.Root.GetForce(planet, THETA) / planet.Mass;
                 planet.AddVelocity(acceleration * deltaTime);
                 planet.Move(deltaTime);
             }
