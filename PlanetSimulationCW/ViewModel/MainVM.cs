@@ -11,17 +11,22 @@ namespace PlanetSimulationCW.ViewModel
     {
         private Point prevMousePos;
         private Quaternion cameraRotation = Quaternion.Identity;
-        private double rotationSpeed = 5;
+        private double rotationSpeed = 10;
         const double moveSpeedMin = 1;
-        const double moveSpeedMax = 200;
+        const double moveSpeedMax = 4000;
         const double moveSpeedMaxTime = 3000; // Через сколько миллисекунд достигается максимальная скорость перемещения камеры (с зажатой клавишой перемещения)
         const double rotationSensitivity = 0.05f;
         private List<Key> pressedKeys = new List<Key>();
         private bool rightMouseDown = false;
         private readonly Key[] movementKeys = { Key.W, Key.A, Key.S, Key.D, Key.Q, Key.E };
         private bool renderOctants = false;
+        private long targetFrameTime = 16; // 60 fps
+        private long frameTime = 0; // Время в миллисекундах, за которое отрисовался текущий кадр (без дополнительного ожидания после отрисовки)
+        private long deltaTime = 0; // Время между прошлым и текущим кадром в миллисекундах
 
         private Stopwatch movementStopwatch = new Stopwatch();
+        private Stopwatch frameStopwatch = new Stopwatch();
+        private Stopwatch deltaTimeStopwatch = new Stopwatch();
 
         Simulation simulation;
 
@@ -67,7 +72,7 @@ namespace PlanetSimulationCW.ViewModel
 
         public MainVM()
         {
-            simulation = new Simulation(200);
+            simulation = new Simulation(800);
 
             Camera = new PerspectiveCamera();
             Camera.Position = new Point3D(0, 0, 300);
@@ -75,7 +80,6 @@ namespace PlanetSimulationCW.ViewModel
             Camera.UpDirection = new Vector3D(0, 1, 0);
 
             DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(30);
             timer.Tick += Update;
             timer.Start();
 
@@ -144,7 +148,7 @@ namespace PlanetSimulationCW.ViewModel
             // Если любая из двигающих камеру клавиш нажата впервые
             if (pressedKeys.Intersect(movementKeys).Any() == false && movementKeys.Contains(key))
             {
-                movementStopwatch = Stopwatch.StartNew();
+                movementStopwatch.Restart();
             }
         }
 
@@ -169,18 +173,28 @@ namespace PlanetSimulationCW.ViewModel
 
             Camera.LookDirection = lookDirection;
             Camera.UpDirection = upDirection;
-
-            //Log = lookDirection.ToString() + " / " + upDirection.ToString();
         }
 
         private void Update(object? sender, EventArgs e)
         {
+            frameStopwatch.Restart();
             MoveCamera();
 
             // Отрисовка планет во View
             ModelGroup = CreateModelGroup(simulation.planets, simulation.octree);
 
-            simulation.SimulateStep();
+            simulation.SimulateStep(deltaTime / 1000d);
+
+            frameTime = frameStopwatch.ElapsedMilliseconds;
+            if (frameTime <= targetFrameTime)
+            {
+                Thread.Sleep((int)(targetFrameTime - frameTime));
+            }
+
+            Log = (1000 / frameStopwatch.ElapsedMilliseconds).ToString();
+
+            deltaTime = deltaTimeStopwatch.ElapsedMilliseconds;
+            deltaTimeStopwatch.Restart();
         }
 
         private void MoveCamera()
@@ -226,8 +240,7 @@ namespace PlanetSimulationCW.ViewModel
             if (moveDirection.Length > 0)
             {
                 moveDirection.Normalize();
-                Log = MathUtils.Linear(0, moveSpeedMaxTime, movementStopwatch.ElapsedMilliseconds, moveSpeedMin, moveSpeedMax).ToString();
-                Camera.Position += MathUtils.Linear(0, moveSpeedMaxTime, movementStopwatch.ElapsedMilliseconds, moveSpeedMin, moveSpeedMax) * moveDirection;
+                Camera.Position += MathUtils.Linear(0, moveSpeedMaxTime, movementStopwatch.ElapsedMilliseconds, moveSpeedMin, moveSpeedMax) * moveDirection * deltaTime / 1000d;
             }
         }
 

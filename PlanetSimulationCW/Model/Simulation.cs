@@ -13,11 +13,7 @@ namespace PlanetSimulationCW.Model
         public Octree octree;
         private double octreeMaxSize = 1000000;
 
-        int frame = 0;
-
-        // Время между кадрами (влияет на скорость симуляции). Пусть это будет постоянным значением пока что.
-        private double deltaTime = 0.16f;
-        private double simulationSpeedMultiplier = 100000000;
+        private double simulationSpeedMultiplier = 1000000000;
 
         public Simulation(int planetCount)
         {
@@ -37,7 +33,7 @@ namespace PlanetSimulationCW.Model
             }
         }
 
-        public void SimulateStep()
+        public void SimulateStep(double deltaTime)
         {
             octree.UpdateOctants(planets);
 
@@ -56,7 +52,6 @@ namespace PlanetSimulationCW.Model
                 }
             }
 
-            frame++;
 
             //float deltaTimeSquared = deltaTime * deltaTime;
             //for (int i = 0; i < planets.Count; i++)
