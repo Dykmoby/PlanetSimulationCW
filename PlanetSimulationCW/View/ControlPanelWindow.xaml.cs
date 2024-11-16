@@ -3,12 +3,12 @@ using System.Windows;
 
 namespace PlanetSimulationCW
 {
-    public partial class MainWindow : Window
+    public partial class ControlPanelWindow : Window
     {
-        public MainWindow()
+        public ControlPanelWindow()
         {
             InitializeComponent();
-            mainWindow.DataContext = new MainVM();
+            controlPanelWindow.DataContext = new ControlPanelVM();
         }
     }
 }

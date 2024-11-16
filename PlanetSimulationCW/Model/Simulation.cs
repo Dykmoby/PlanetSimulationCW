@@ -35,6 +35,8 @@ namespace PlanetSimulationCW.Model
 
         public void SimulateStep(double deltaTime)
         {
+            if (GlobalSettings.simulationStopped) return;
+
             octree.UpdateOctants(planets);
 
             foreach (Planet planet in planets)

@@ -24,6 +24,8 @@ namespace PlanetSimulationCW.ViewModel
         private long frameTime = 0; // Время в миллисекундах, за которое отрисовался текущий кадр (без дополнительного ожидания после отрисовки)
         private long deltaTime = 0; // Время между прошлым и текущим кадром в миллисекундах
 
+        private ControlPanelWindow controlPanelWindow;
+
         private Stopwatch movementStopwatch = new Stopwatch();
         private Stopwatch frameStopwatch = new Stopwatch();
         private Stopwatch deltaTimeStopwatch = new Stopwatch();
@@ -69,10 +71,14 @@ namespace PlanetSimulationCW.ViewModel
         public RelayCommand<MouseButtonEventArgs> MouseRightButtonUpCommand { get; private set; }
         public RelayCommand<KeyEventArgs> KeyDownCommand { get; private set; }
         public RelayCommand<KeyEventArgs> KeyUpCommand { get; private set; }
+        public RelayCommand MainWindowClosed { get; private set; }
 
         public MainVM()
         {
-            simulation = new Simulation(800);
+            controlPanelWindow = new ControlPanelWindow();
+            controlPanelWindow.Show();
+
+            simulation = new Simulation(300);
 
             Camera = new PerspectiveCamera();
             Camera.Position = new Point3D(0, 0, 300);
@@ -88,6 +94,7 @@ namespace PlanetSimulationCW.ViewModel
             MouseRightButtonUpCommand = new RelayCommand<MouseButtonEventArgs>(OnMouseRightButtonUp);
             KeyDownCommand = new RelayCommand<KeyEventArgs>(OnKeyDown);
             KeyUpCommand = new RelayCommand<KeyEventArgs>(OnKeyUp);
+            MainWindowClosed = new RelayCommand(obj => { Application.Current.Shutdown(0); });
         }
 
         private void OnMouseRightButtonDown(MouseButtonEventArgs e)

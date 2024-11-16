@@ -1,6 +1,5 @@
 ﻿<Window x:Class="PlanetSimulationCW.MainWindow"
         x:Name="mainWindow"
-        Focusable="True"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -24,6 +23,9 @@
         </i:EventTrigger>
         <i:EventTrigger EventName="MouseMove">
             <local:MouseEventArgsCommandAction Command="{Binding MouseMoveCommand}"/>
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Closed">
+            <i:InvokeCommandAction Command="{Binding MainWindowClosed}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid Background="Black">
