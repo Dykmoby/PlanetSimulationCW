@@ -2,7 +2,7 @@
 
 namespace PlanetSimulationCW.Model
 {
-    public static class QuaternionExtensions
+    public static class MyExtensions
     {
         // Поворот вектора кватернионом
         public static Vector3D Rotate(this Quaternion q, Vector3D v, double rotationSpeed = 1)

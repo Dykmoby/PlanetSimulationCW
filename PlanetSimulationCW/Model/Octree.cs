@@ -12,7 +12,7 @@ namespace PlanetSimulationCW.Model
             public double size;
             public Node[] children;
             private PlanetAggregate planetsAggregate;
-            private List<Planet> planets;
+            public List<Planet> planets;
 
             public Node(Vector3D center, double size)
             {
@@ -215,6 +215,51 @@ namespace PlanetSimulationCW.Model
                 ClearAllPlanets(node.children[i]);
                 node.children[i] = null;
             }
+        }
+
+        public List<Planet> FindNearestPlanets(Vector3D point, double radius)  // Возвращает ближайшие к зададанной точке и в заданном радиусе от этой точки планеты
+        {
+            List<Planet> result = new List<Planet>();
+            FindNearestPlanets(root, point, radius, result);
+            return result;
+        }
+
+        private void FindNearestPlanets(Node node, Vector3D point, double radius, List<Planet> result)
+        {
+            if (!IntersectsSphere(node.center, node.size, point, radius))
+                return;
+
+            if (node.IsLeaf)
+            {
+                foreach (Planet planet in node.planets)
+                {
+                    if ((point - planet.Position).Length <= radius)
+                        result.Add(planet);
+                }
+            }
+            else
+            {
+                foreach (Node child in node.children)
+                {
+                    if (child != null)
+                        FindNearestPlanets(child, point, radius, result);
+                }
+            }
+        }
+
+        private bool IntersectsSphere(Vector3D octantCenter, double octantSize, Vector3D sphereCenter, double sphereRadius)
+        {
+            // Находим самую ближайшую точку к центру сферы на октанте
+            double closestX = Math.Clamp(sphereCenter.X, octantCenter.X - octantSize, octantCenter.X + octantSize);
+            double closestY = Math.Clamp(sphereCenter.Y, octantCenter.Y - octantSize, octantCenter.Y + octantSize);
+            double closestZ = Math.Clamp(sphereCenter.Z, octantCenter.Z - octantSize, octantCenter.Z + octantSize);
+
+            // Расстояние от этой точки до центра сферы
+            double distanceSquared = (closestX - sphereCenter.X) * (closestX - sphereCenter.X)
+                                   + (closestY - sphereCenter.Y) * (closestY - sphereCenter.Y)
+                                   + (closestZ - sphereCenter.Z) * (closestZ - sphereCenter.Z);
+
+            return distanceSquared <= sphereRadius * sphereRadius;
         }
     }
 }

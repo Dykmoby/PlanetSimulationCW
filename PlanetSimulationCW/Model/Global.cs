@@ -1,6 +1,6 @@
 ﻿namespace PlanetSimulationCW.Model
 {
-    static class GlobalSettings
+    static class Global
     {
         public static bool simulationStopped = false;
     }

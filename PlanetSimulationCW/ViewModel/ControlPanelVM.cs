@@ -27,8 +27,8 @@ namespace PlanetSimulationCW.ViewModel
 
         private void ToggleSimulation(object e)
         {
-            GlobalSettings.simulationStopped = !GlobalSettings.simulationStopped;
-            if (GlobalSettings.simulationStopped)
+            Global.simulationStopped = !Global.simulationStopped;
+            if (Global.simulationStopped)
             {
                 PauseButtonText = "Resume";
             }

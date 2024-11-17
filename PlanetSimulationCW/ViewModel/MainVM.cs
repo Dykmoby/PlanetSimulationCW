@@ -1,6 +1,7 @@
 ﻿using PlanetSimulationCW.Model;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
@@ -12,10 +13,11 @@ namespace PlanetSimulationCW.ViewModel
         private Point prevMousePos;
         private Quaternion cameraRotation = Quaternion.Identity;
         private double rotationSpeed = 10;
-        const double moveSpeedMin = 1;
-        const double moveSpeedMax = 4000;
-        const double moveSpeedMaxTime = 3000; // Через сколько миллисекунд достигается максимальная скорость перемещения камеры (с зажатой клавишой перемещения)
-        const double rotationSensitivity = 0.05f;
+        private double moveSpeedMax = 4000;
+        private double moveSpeedMin = 1;
+        private double moveSpeedMaxTime = 3000; // Через сколько миллисекунд достигается максимальная скорость перемещения камеры (с зажатой клавишой перемещения)
+        private double rotationSensitivity = 0.05f;
+        private int maxRaycastDistance = 10000; // Максимальное расстояние луча, испускаемого из камеры (для выбора планеты нажатием)
         private List<Key> pressedKeys = new List<Key>();
         private bool rightMouseDown = false;
         private readonly Key[] movementKeys = { Key.W, Key.A, Key.S, Key.D, Key.Q, Key.E };
@@ -34,7 +36,10 @@ namespace PlanetSimulationCW.ViewModel
 
         private Model3DGroup modelGroup;
         private PerspectiveCamera camera;
+        private Viewport3D viewport;
         private string log;
+
+        private Point selMousePos;
 
         public Model3DGroup ModelGroup
         {
@@ -69,21 +74,24 @@ namespace PlanetSimulationCW.ViewModel
         public RelayCommand<MouseButtonEventArgs> MouseRightButtonDownCommand { get; private set; }
         public RelayCommand<MouseEventArgs> MouseMoveCommand { get; private set; }
         public RelayCommand<MouseButtonEventArgs> MouseRightButtonUpCommand { get; private set; }
+        public RelayCommand<MouseButtonEventArgs> MouseLeftButtonUpCommand { get; private set; }
         public RelayCommand<KeyEventArgs> KeyDownCommand { get; private set; }
         public RelayCommand<KeyEventArgs> KeyUpCommand { get; private set; }
         public RelayCommand MainWindowClosed { get; private set; }
 
-        public MainVM()
+        public MainVM(Viewport3D viewport)
         {
+            this.viewport = viewport;
             controlPanelWindow = new ControlPanelWindow();
             controlPanelWindow.Show();
 
             simulation = new Simulation(300);
 
             Camera = new PerspectiveCamera();
-            Camera.Position = new Point3D(0, 0, 300);
+            Camera.Position = new Point3D(0, 0, 0);
             Camera.LookDirection = new Vector3D(0, 0, -1);
             Camera.UpDirection = new Vector3D(0, 1, 0);
+            Camera.FarPlaneDistance = 1000000;
 
             DispatcherTimer timer = new DispatcherTimer();
             timer.Tick += Update;
@@ -92,6 +100,7 @@ namespace PlanetSimulationCW.ViewModel
             MouseRightButtonDownCommand = new RelayCommand<MouseButtonEventArgs>(OnMouseRightButtonDown);
             MouseMoveCommand = new RelayCommand<MouseEventArgs>(OnMouseMove);
             MouseRightButtonUpCommand = new RelayCommand<MouseButtonEventArgs>(OnMouseRightButtonUp);
+            MouseLeftButtonUpCommand = new RelayCommand<MouseButtonEventArgs>(OnMouseLeftButtonUp);
             KeyDownCommand = new RelayCommand<KeyEventArgs>(OnKeyDown);
             KeyUpCommand = new RelayCommand<KeyEventArgs>(OnKeyUp);
             MainWindowClosed = new RelayCommand(obj => { Application.Current.Shutdown(0); });
@@ -106,6 +115,7 @@ namespace PlanetSimulationCW.ViewModel
 
         private void OnMouseMove(MouseEventArgs e)
         {
+            selMousePos = e.GetPosition((UIElement)e.Source);
             if (rightMouseDown == true)
             {
                 Point currentMousePos = e.GetPosition((UIElement)e.Source);
@@ -129,6 +139,12 @@ namespace PlanetSimulationCW.ViewModel
         {
             Mouse.Capture(null);
             rightMouseDown = false;
+        }
+
+        private void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+        {
+            //Planet planet = SelectPlanet(e.GetPosition((UIElement)e.Source));
+            //MessageBox.Show(planet?.Color.ToString() + "\n" + e.GetPosition((UIElement)e.Source));
         }
 
         private void OnKeyDown(KeyEventArgs e)
@@ -187,6 +203,8 @@ namespace PlanetSimulationCW.ViewModel
             frameStopwatch.Restart();
             MoveCamera();
 
+            SelectPlanet(selMousePos);
+
             // Отрисовка планет во View
             ModelGroup = CreateModelGroup(simulation.planets, simulation.octree);
 
@@ -198,7 +216,7 @@ namespace PlanetSimulationCW.ViewModel
                 Thread.Sleep((int)(targetFrameTime - frameTime));
             }
 
-            Log = (1000 / frameStopwatch.ElapsedMilliseconds).ToString();
+            //Log = (1000 / frameStopwatch.ElapsedMilliseconds).ToString();
 
             deltaTime = deltaTimeStopwatch.ElapsedMilliseconds;
             deltaTimeStopwatch.Restart();
@@ -250,6 +268,122 @@ namespace PlanetSimulationCW.ViewModel
                 Camera.Position += MathUtils.Linear(0, moveSpeedMaxTime, movementStopwatch.ElapsedMilliseconds, moveSpeedMin, moveSpeedMax) * moveDirection * deltaTime / 1000d;
             }
         }
+
+        public Ray3D GetRayFromScreen(Point mousePosition)
+        {
+            // Преобразуем координаты мыши в нормализованные координаты устройства (-1 до 1)
+            double aspectRatio = viewport.ActualWidth / viewport.ActualHeight;
+            Point normalizedPoint = new Point(
+                (2.0 * mousePosition.X / viewport.ActualWidth - 1.0),
+                -(2.0 * mousePosition.Y / viewport.ActualHeight - 1.0)
+            );
+
+            double fieldOfView = Camera.FieldOfView * Math.PI / 180.0; // конвертируем в радианы
+            double tanFov = Math.Tan(fieldOfView / 2.0);
+
+            // Вычисляем направление луча в пространстве камеры
+            Vector3D rayDirection = new Vector3D(
+                normalizedPoint.X * tanFov * aspectRatio,
+                normalizedPoint.Y * tanFov,
+                -1.0
+            );
+
+            // Получаем матрицу вида
+            Matrix3D viewMatrix = GetViewMatrix(camera);
+            viewMatrix.Invert();
+
+            // Преобразуем начало и направление луча в мировые координаты
+            Point3D rayOrigin = camera.Position;
+            rayDirection = Vector3D.Multiply(rayDirection, viewMatrix);
+            rayDirection.Normalize();
+
+            return new Ray3D((Vector3D) rayOrigin, rayDirection);
+        }
+
+        private Matrix3D GetViewMatrix(PerspectiveCamera camera)
+        {
+            // Создаем матрицу вида на основе параметров камеры
+            Vector3D lookDirection = camera.LookDirection;
+            Vector3D upDirection = camera.UpDirection;
+            Point3D position = camera.Position;
+
+            // Нормализуем направление взгляда
+            lookDirection.Normalize();
+
+            // Вычисляем правый вектор как векторное произведение
+            Vector3D rightVector = Vector3D.CrossProduct(lookDirection, upDirection);
+            rightVector.Normalize();
+
+            // Пересчитываем up вектор для обеспечения ортогональности
+            upDirection = Vector3D.CrossProduct(rightVector, lookDirection);
+            upDirection.Normalize();
+
+            // Создаем матрицу вида
+            Matrix3D viewMatrix = new Matrix3D(
+                rightVector.X, upDirection.X, -lookDirection.X, 0,
+                rightVector.Y, upDirection.Y, -lookDirection.Y, 0,
+                rightVector.Z, upDirection.Z, -lookDirection.Z, 0,
+                -Vector3D.DotProduct(rightVector, (Vector3D)position),
+                -Vector3D.DotProduct(upDirection, (Vector3D)position),
+                Vector3D.DotProduct(lookDirection, (Vector3D)position),
+                1
+            );
+
+            return viewMatrix;
+        }
+
+        // Проверка пересечения луча с планетой
+        private bool RayPlanetIntersection(Ray3D ray, Planet planet, out double distance)
+        {
+            distance = double.MaxValue;
+            Vector3D l = planet.Position - ray.Origin;
+            double tca = Vector3D.DotProduct(l, ray.Direction);
+
+            // Если tca < 0, луч уже никак не пересечет планету, потому что он направлен в совершенно другую сторону
+            if (tca < 0) return false;
+
+            double d2 = Vector3D.DotProduct(l, l) - tca * tca;
+            double r2 = planet.Radius * planet.Radius;
+
+            if (d2 > r2) return false;
+
+            double thc = Math.Sqrt(r2 - d2);
+            double t0 = tca - thc;
+            double t1 = tca + thc;
+
+            if (t0 < 0 && t1 < 0) return false;
+
+            distance = t0 < 0 ? t1 : t0;
+            return true;
+        }
+
+        // Выбрать планету при помощи мышки (курсором)
+        public Planet? SelectPlanet(Point mousePosition)
+        {
+            Ray3D ray = GetRayFromScreen(mousePosition);
+            if (ray == null) return null;
+
+            Planet? closestPlanet = null;
+            double closestDistance = double.MaxValue;
+
+            foreach (Planet planet in simulation.octree.FindNearestPlanets((Vector3D)Camera.Position, maxRaycastDistance))
+            {
+                double distance;
+                if (RayPlanetIntersection(ray, planet, out distance))
+                {
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        closestPlanet = planet;
+                    }
+                }
+            }
+
+            Log = ray.Origin.ToString() + "\n" + ray.Direction.ToString() + "\n" + closestPlanet?.Color.ToString();
+
+            return closestPlanet;
+        }
+
 
         private Model3DGroup CreateModelGroup(List<Planet> planets, Octree octree)
         {
@@ -309,11 +443,11 @@ namespace PlanetSimulationCW.ViewModel
             {
                 return 3;
             }
-            else if(distance >= 3000 && distance < 50000) // LOD 4
+            else if (distance >= 3000 && distance < 50000) // LOD 4
             {
                 return 2;
             }
-            else if(distance >= 50000) // LOD 5 (NO RENDER)
+            else if (distance >= 50000) // LOD 5 (NO RENDER)
             {
                 return 0; // Не рендерить планету
             }
