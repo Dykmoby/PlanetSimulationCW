@@ -42,6 +42,6 @@
                 <ModelVisual3D Content="{Binding ModelGroup}"/>
             </Viewport3D.Children>
         </Viewport3D>
-        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding Log}" VerticalAlignment="Top" Foreground="White"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding Log}" VerticalAlignment="Top" Foreground="White" IsHitTestVisible="False"/>
     </Grid>
 </Window>

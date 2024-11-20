@@ -1,5 +1,6 @@
 ﻿using PlanetSimulationCW.Model;
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -189,7 +190,7 @@ namespace PlanetSimulationCW.ViewModel
 
         private void UpdateCameraDirection()
         {
-            // Исходное направление камеры (можно изменить на начальное состояние камеры)
+            // Исходное направление камеры
             Vector3D initialLookDirection = new Vector3D(0, 0, -1);
             Vector3D initialUpDirection = new Vector3D(0, 1, 0);
 
@@ -273,42 +274,43 @@ namespace PlanetSimulationCW.ViewModel
 
         public Ray3D GetRayFromScreen(Point mousePosition)
         {
-            // Преобразуем координаты мыши в нормализованные координаты устройства (-1 до 1)
-            double aspectRatio = viewport.ActualWidth / viewport.ActualHeight;
-            Point normalizedPoint = new Point(
-                (2.0 * mousePosition.X / viewport.ActualWidth - 1.0),
-                -(2.0 * mousePosition.Y / viewport.ActualHeight - 1.0)
+            //return Point2DtoRay3D(viewport, mousePosition);
+            double aspect = viewport.ActualWidth / viewport.ActualHeight;
+
+            Point point01 = new Point(mousePosition.X / viewport.ActualWidth, mousePosition.Y / viewport.ActualHeight);
+            
+            // NDC space
+            var pointNormalized = new Point3D(
+                (2.0 * point01.X - 1.0),
+                -(2.0 * point01.Y - 1.0),
+                0
             );
 
-            normalizedPoint.X /= 2;
-            normalizedPoint.Y /= 2;
-
-            double fieldOfView = Camera.FieldOfView * Math.PI / 180.0; // конвертируем в радианы
-            double tanFov = Math.Tan(fieldOfView / 2.0);
-
-            // Вычисляем направление луча в пространстве камеры
-            Vector3D rayDirection = new Vector3D(
-                normalizedPoint.X * tanFov * aspectRatio,
-                normalizedPoint.Y * tanFov,
-                -1.0
-            );
-
-            // Получаем матрицу вида
+            // Get Camera Matrices
             Matrix3D viewMatrix = GetViewMatrix(camera);
-            viewMatrix.Invert();
+            Matrix3D projectionMatrix = GetProjectionMatrix(camera, aspect);
 
-            // Преобразуем начало и направление луча в мировые координаты
+            Matrix3D viewProjectionMatrix = viewMatrix * projectionMatrix;
+            viewProjectionMatrix.Invert();
+
+            // Get Points on near and far frustum planes on frustum
+            pointNormalized.Z = 0.0;
+            Point3D nearPoint = viewProjectionMatrix.Transform(pointNormalized);
+            pointNormalized.Z = 1.0;
+            Point3D farPoint = viewProjectionMatrix.Transform(pointNormalized);
+
+            // Create ray
             Point3D rayOrigin = camera.Position;
-            rayDirection = Vector3D.Multiply(rayDirection, viewMatrix);
+            Vector3D rayDirection = farPoint - nearPoint;
             rayDirection.Normalize();
 
-            return new Ray3D((Vector3D) rayOrigin, rayDirection);
+            return new Ray3D((Vector3D)rayOrigin, rayDirection);
         }
 
-        private Matrix3D GetViewMatrix(PerspectiveCamera camera)
+        public static Matrix3D GetViewMatrix(PerspectiveCamera camera)
         {
             // Создаем матрицу вида на основе параметров камеры
-            Vector3D lookDirection = camera.LookDirection;
+            Vector3D lookDirection = -camera.LookDirection;
             Vector3D upDirection = camera.UpDirection;
             Point3D position = camera.Position;
 
@@ -316,25 +318,38 @@ namespace PlanetSimulationCW.ViewModel
             lookDirection.Normalize();
 
             // Вычисляем правый вектор как векторное произведение
-            Vector3D rightVector = Vector3D.CrossProduct(lookDirection, upDirection);
+            Vector3D rightVector = Vector3D.CrossProduct(upDirection, lookDirection);
             rightVector.Normalize();
 
             // Пересчитываем up вектор для обеспечения ортогональности
-            upDirection = Vector3D.CrossProduct(rightVector, lookDirection);
+            upDirection = Vector3D.CrossProduct(lookDirection, rightVector);
             upDirection.Normalize();
 
             // Создаем матрицу вида
             Matrix3D viewMatrix = new Matrix3D(
-                rightVector.X, upDirection.X, -lookDirection.X, 0,
-                rightVector.Y, upDirection.Y, -lookDirection.Y, 0,
-                rightVector.Z, upDirection.Z, -lookDirection.Z, 0,
-                -Vector3D.DotProduct(rightVector, (Vector3D)position),
-                -Vector3D.DotProduct(upDirection, (Vector3D)position),
-                Vector3D.DotProduct(lookDirection, (Vector3D)position),
-                1
+                rightVector.X, upDirection.X, lookDirection.X, 0,
+                rightVector.Y, upDirection.Y, lookDirection.Y, 0,
+                rightVector.Z, upDirection.Z, lookDirection.Z, 0,
+                0, 0, 0, 1
             );
 
             return viewMatrix;
+        }
+        public static Matrix3D GetProjectionMatrix(PerspectiveCamera camera, double aspect)
+        {
+            double fovRadians = camera.FieldOfView * (Math.PI / 360.0);
+            double n = camera.NearPlaneDistance;
+            double f = camera.FarPlaneDistance;
+
+            double h = 1.0 / Math.Tan(fovRadians);
+
+            double fn = f - n;
+
+            return new Matrix3D(
+                h, 0, 0, 0,
+                0, h * aspect, 0, 0,
+                0, 0, -(f + n) / fn, -1,
+                0, 0, -2.0 * f * n / fn, 0);
         }
 
         // Проверка пересечения луча с планетой
@@ -385,7 +400,6 @@ namespace PlanetSimulationCW.ViewModel
             }
 
             Log = ray.Origin.ToString() + "\n" + ray.Direction.ToString() + "\n" + closestPlanet?.Color.ToString();
-
             return closestPlanet;
         }
 
@@ -395,8 +409,16 @@ namespace PlanetSimulationCW.ViewModel
             Model3DGroup modelGroup = new Model3DGroup();
 
             Ray3D ray = GetRayFromScreen(selMousePos);
-            GeometryModel3D rayGroup = Ray3DHelper.CreateRay((Point3D)ray.Origin + ray.Direction, ray.Direction);
-            modelGroup.Children.Add(rayGroup);
+
+            GeometryModel3D geometryModelDebug = MeshUtils.CreatePlanetGeometryModel(Color.FromArgb(255, 255, 255, 255), 8);
+            Transform3DGroup transformGroupDebug = new Transform3DGroup();
+            transformGroupDebug.Children.Add(new TranslateTransform3D(ray.Origin + ray.Direction * 50));
+            geometryModelDebug.Transform = transformGroupDebug;
+
+            modelGroup.Children.Add(geometryModelDebug);
+
+            //GeometryModel3D rayGroup = Ray3DHelper.CreateRay((Point3D)ray.Origin, ray.Direction);
+            //modelGroup.Children.Add(rayGroup);
 
             foreach (Planet planet in planets) // Отрисовка планет
             {
