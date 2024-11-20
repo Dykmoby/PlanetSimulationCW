@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 
@@ -92,6 +93,7 @@ namespace PlanetSimulationCW.ViewModel
             Camera.LookDirection = new Vector3D(0, 0, -1);
             Camera.UpDirection = new Vector3D(0, 1, 0);
             Camera.FarPlaneDistance = 1000000;
+            Camera.FieldOfView = 45;
 
             DispatcherTimer timer = new DispatcherTimer();
             timer.Tick += Update;
@@ -278,6 +280,9 @@ namespace PlanetSimulationCW.ViewModel
                 -(2.0 * mousePosition.Y / viewport.ActualHeight - 1.0)
             );
 
+            normalizedPoint.X /= 2;
+            normalizedPoint.Y /= 2;
+
             double fieldOfView = Camera.FieldOfView * Math.PI / 180.0; // конвертируем в радианы
             double tanFov = Math.Tan(fieldOfView / 2.0);
 
@@ -388,6 +393,10 @@ namespace PlanetSimulationCW.ViewModel
         private Model3DGroup CreateModelGroup(List<Planet> planets, Octree octree)
         {
             Model3DGroup modelGroup = new Model3DGroup();
+
+            Ray3D ray = GetRayFromScreen(selMousePos);
+            GeometryModel3D rayGroup = Ray3DHelper.CreateRay((Point3D)ray.Origin + ray.Direction, ray.Direction);
+            modelGroup.Children.Add(rayGroup);
 
             foreach (Planet planet in planets) // Отрисовка планет
             {
