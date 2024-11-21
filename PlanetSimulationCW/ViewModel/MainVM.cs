@@ -1,6 +1,5 @@
 ﻿using PlanetSimulationCW.Model;
 using System.Diagnostics;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -85,7 +84,7 @@ namespace PlanetSimulationCW.ViewModel
             Global.controlPanelWindow = new ControlPanelWindow();
             Global.controlPanelWindow.Show();
 
-            simulation = new Simulation(500);
+            simulation = new Simulation(1000);
 
             Camera = new PerspectiveCamera();
             Camera.Position = new Point3D(0, 0, 0);

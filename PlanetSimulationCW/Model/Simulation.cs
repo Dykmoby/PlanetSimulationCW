@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 namespace PlanetSimulationCW.Model
@@ -7,13 +6,13 @@ namespace PlanetSimulationCW.Model
     class Simulation
     {
         public const double G = 6.6743015E-11;
-        public const double THETA = 0.4;
+        public const double THETA = 0.35;
         public const int SPEED_OF_LIGHT = 299792458;
         public List<Planet> planets;
         public Octree octree;
         private double octreeMaxSize = 1000000;
 
-        private double simulationSpeedMultiplier = 1000000000;
+        private double simulationSpeedMultiplier = 10000000000;
 
         public Simulation(int planetCount)
         {

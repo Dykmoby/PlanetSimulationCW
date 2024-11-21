@@ -105,10 +105,12 @@ namespace PlanetSimulationCW.Model
 
                 public Vector3D CalculateForce(Planet planet)
                 {
-                    double distance = (centerOfMass - planet.Position).Length;
-                    double product = Simulation.G * mass * planet.Mass / (distance * distance);
+                    Vector3D direction = centerOfMass - planet.Position;
+                    double distanceSqr = Vector3D.DotProduct(direction, direction);
+                    direction.Normalize();
+                    double product = Simulation.G * mass * planet.Mass / distanceSqr;
 
-                    return (centerOfMass - planet.Position) * product;
+                    return direction * product;
                 }
             }
         }
