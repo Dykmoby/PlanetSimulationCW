@@ -28,8 +28,6 @@ namespace PlanetSimulationCW.ViewModel
         private long frameTime = 0; // Время в миллисекундах, за которое отрисовался текущий кадр (без дополнительного ожидания после отрисовки)
         private long deltaTime = 0; // Время между прошлым и текущим кадром в миллисекундах
 
-        private ControlPanelWindow controlPanelWindow;
-
         private Stopwatch movementStopwatch = new Stopwatch();
         private Stopwatch frameStopwatch = new Stopwatch();
         private Stopwatch deltaTimeStopwatch = new Stopwatch();
@@ -84,8 +82,8 @@ namespace PlanetSimulationCW.ViewModel
         public MainVM(Viewport3D viewport)
         {
             this.viewport = viewport;
-            controlPanelWindow = new ControlPanelWindow();
-            controlPanelWindow.Show();
+            Global.controlPanelWindow = new ControlPanelWindow();
+            Global.controlPanelWindow.Show();
 
             simulation = new Simulation(300);
 
@@ -138,16 +136,24 @@ namespace PlanetSimulationCW.ViewModel
             }
         }
 
+        // Перемещение камерой при помощи ПКМ
         private void OnMouseRightButtonUp(MouseButtonEventArgs e)
         {
             Mouse.Capture(null);
             rightMouseDown = false;
         }
 
+        // Выбор планеты при помощи ЛКМ
         private void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            //Planet planet = SelectPlanet(e.GetPosition((UIElement)e.Source));
-            //MessageBox.Show(planet?.Color.ToString() + "\n" + e.GetPosition((UIElement)e.Source));
+            Planet selectedPlanet = SelectPlanet(e.GetPosition((UIElement)e.Source));
+            if (selectedPlanet == null)
+            {
+                ((ControlPanelVM)Global.controlPanelWindow.DataContext).ClearPlanetInfo();
+                return;
+            }
+
+            ((ControlPanelVM)Global.controlPanelWindow.DataContext).DisplayPlanetInfo(selectedPlanet);
         }
 
         private void OnKeyDown(KeyEventArgs e)
@@ -205,8 +211,6 @@ namespace PlanetSimulationCW.ViewModel
         {
             frameStopwatch.Restart();
             MoveCamera();
-
-            SelectPlanet(selMousePos);
 
             // Отрисовка планет во View
             ModelGroup = CreateModelGroup(simulation.planets, simulation.octree);
@@ -399,7 +403,6 @@ namespace PlanetSimulationCW.ViewModel
                 }
             }
 
-            Log = ray.Origin.ToString() + "\n" + ray.Direction.ToString() + "\n" + closestPlanet?.Color.ToString();
             return closestPlanet;
         }
 
@@ -407,18 +410,6 @@ namespace PlanetSimulationCW.ViewModel
         private Model3DGroup CreateModelGroup(List<Planet> planets, Octree octree)
         {
             Model3DGroup modelGroup = new Model3DGroup();
-
-            Ray3D ray = GetRayFromScreen(selMousePos);
-
-            GeometryModel3D geometryModelDebug = MeshUtils.CreatePlanetGeometryModel(Color.FromArgb(255, 255, 255, 255), 8);
-            Transform3DGroup transformGroupDebug = new Transform3DGroup();
-            transformGroupDebug.Children.Add(new TranslateTransform3D(ray.Origin + ray.Direction * 50));
-            geometryModelDebug.Transform = transformGroupDebug;
-
-            modelGroup.Children.Add(geometryModelDebug);
-
-            //GeometryModel3D rayGroup = Ray3DHelper.CreateRay((Point3D)ray.Origin, ray.Direction);
-            //modelGroup.Children.Add(rayGroup);
 
             foreach (Planet planet in planets) // Отрисовка планет
             {
@@ -457,28 +448,29 @@ namespace PlanetSimulationCW.ViewModel
         // Получить LOD в зависимости от расстояния между камерой и планетой
         private int GetLODByDistance(Planet planet)
         {
-            double distance = (planet.Position - (Vector3D)Camera.Position).Length;
-            if (distance >= 0 && distance < 100) // LOD 0
+            Vector3D dir = planet.Position - (Vector3D)Camera.Position;
+            double distanceSqr = Vector3D.DotProduct(dir, dir);
+            if (distanceSqr >= 0 && distanceSqr < 10000) // LOD 0
             {
                 return 12;
             }
-            else if (distance >= 100 && distance < 300) // LOD 1
+            else if (distanceSqr >= 10000 && distanceSqr < 90000) // LOD 1
             {
                 return 8;
             }
-            else if (distance >= 300 && distance < 1000) // LOD 2
+            else if (distanceSqr >= 90000 && distanceSqr < 1000000) // LOD 2
             {
                 return 5;
             }
-            else if (distance >= 1000 && distance < 3000) // LOD 3
+            else if (distanceSqr >= 1000000 && distanceSqr < 9000000) // LOD 3
             {
                 return 3;
             }
-            else if (distance >= 3000 && distance < 50000) // LOD 4
+            else if (distanceSqr >= 9000000 && distanceSqr < 2500000000) // LOD 4
             {
                 return 2;
             }
-            else if (distance >= 50000) // LOD 5 (NO RENDER)
+            else if (distanceSqr >= 2500000000) // LOD 5 (NO RENDER)
             {
                 return 0; // Не рендерить планету
             }

@@ -9,8 +9,17 @@
         mc:Ignorable="d"
         Title="Control Panel" Height="450" Width="250">
     <Grid>
-        <StackPanel Orientation="Vertical">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel Orientation="Vertical" Grid.Row="0">
             <Button Content="{Binding PauseButtonText, FallbackValue='Pause'}" Margin="20,15,20,5" Command="{Binding ToggleSimulationCommand}"/>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" Grid.Row="1">
+            <Label Grid.Row="1" Content="Selected planet info:"/>
+            <TextBlock Grid.Row="1" Text="{Binding PlanetInfoText}" Margin="5, 5, 5, 5"/>
         </StackPanel>
     </Grid>
 </Window>

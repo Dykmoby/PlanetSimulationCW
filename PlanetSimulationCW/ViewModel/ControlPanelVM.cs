@@ -17,6 +17,17 @@ namespace PlanetSimulationCW.ViewModel
             }
         }
 
+        private string planetInfoText;
+        public string PlanetInfoText
+        {
+            get { return planetInfoText; }
+            set
+            {
+                planetInfoText = value;
+                OnPropertyChanged(nameof(PlanetInfoText));
+            }
+        }
+
         public RelayCommand ToggleSimulationCommand { get; private set; }
 
         public ControlPanelVM()
@@ -36,6 +47,16 @@ namespace PlanetSimulationCW.ViewModel
             {
                 PauseButtonText = "Pause";
             }
+        }
+
+        public void DisplayPlanetInfo(Planet planet)
+        {
+            PlanetInfoText = planet.Color.ToString();
+        }
+
+        public void ClearPlanetInfo()
+        {
+            PlanetInfoText = "";
         }
     }
 }
