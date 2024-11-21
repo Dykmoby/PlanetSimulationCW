@@ -85,7 +85,7 @@ namespace PlanetSimulationCW.ViewModel
             Global.controlPanelWindow = new ControlPanelWindow();
             Global.controlPanelWindow.Show();
 
-            simulation = new Simulation(300);
+            simulation = new Simulation(500);
 
             Camera = new PerspectiveCamera();
             Camera.Position = new Point3D(0, 0, 0);
@@ -278,7 +278,6 @@ namespace PlanetSimulationCW.ViewModel
 
         public Ray3D GetRayFromScreen(Point mousePosition)
         {
-            //return Point2DtoRay3D(viewport, mousePosition);
             double aspect = viewport.ActualWidth / viewport.ActualHeight;
 
             Point point01 = new Point(mousePosition.X / viewport.ActualWidth, mousePosition.Y / viewport.ActualHeight);
@@ -413,10 +412,9 @@ namespace PlanetSimulationCW.ViewModel
 
             foreach (Planet planet in planets) // Отрисовка планет
             {
-                int lod = GetLODByDistance(planet);
-                if (lod == 0) continue;
+                MeshUtils.LOD lod = GetLODByDistance(planet);
+                if (lod == MeshUtils.LOD.DONT_RENDER) continue;
                 GeometryModel3D geometryModel = MeshUtils.CreatePlanetGeometryModel(planet.Color, lod);
-                //GeometryModel3D geometryModel = MeshUtils.CreatePlanetGeometryModel(planet.Color);
                 Transform3DGroup transformGroup = new Transform3DGroup();
                 transformGroup.Children.Add(new ScaleTransform3D(planet.Radius, planet.Radius, planet.Radius));
                 transformGroup.Children.Add(new TranslateTransform3D(planet.Position.X, planet.Position.Y, planet.Position.Z));
@@ -446,36 +444,36 @@ namespace PlanetSimulationCW.ViewModel
         }
 
         // Получить LOD в зависимости от расстояния между камерой и планетой
-        private int GetLODByDistance(Planet planet)
+        private MeshUtils.LOD GetLODByDistance(Planet planet)
         {
             Vector3D dir = planet.Position - (Vector3D)Camera.Position;
             double distanceSqr = Vector3D.DotProduct(dir, dir);
             if (distanceSqr >= 0 && distanceSqr < 10000) // LOD 0
             {
-                return 12;
+                return MeshUtils.LOD.ZERO;
             }
             else if (distanceSqr >= 10000 && distanceSqr < 90000) // LOD 1
             {
-                return 8;
+                return MeshUtils.LOD.ONE;
             }
             else if (distanceSqr >= 90000 && distanceSqr < 1000000) // LOD 2
             {
-                return 5;
+                return MeshUtils.LOD.TWO;
             }
             else if (distanceSqr >= 1000000 && distanceSqr < 9000000) // LOD 3
             {
-                return 3;
+                return MeshUtils.LOD.THREE;
             }
             else if (distanceSqr >= 9000000 && distanceSqr < 2500000000) // LOD 4
             {
-                return 2;
+                return MeshUtils.LOD.FOUR;
             }
             else if (distanceSqr >= 2500000000) // LOD 5 (NO RENDER)
             {
-                return 0; // Не рендерить планету
+                return MeshUtils.LOD.DONT_RENDER; // Не рендерить планету
             }
 
-            return 0; // Не рендерить планету
+            return MeshUtils.LOD.DONT_RENDER; // Не рендерить планету
         }
     }
 }

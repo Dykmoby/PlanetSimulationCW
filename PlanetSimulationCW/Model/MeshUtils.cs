@@ -5,14 +5,52 @@ namespace PlanetSimulationCW
 {
     static class MeshUtils
     {
+        public enum LOD
+        {
+            ZERO,
+            ONE,
+            TWO,
+            THREE,
+            FOUR,
+            DONT_RENDER
+        }
+
+        static MeshGeometry3D planetLOD0Mesh = CreatePlanetGeometry(12);
+        static MeshGeometry3D planetLOD1Mesh = CreatePlanetGeometry(8);
+        static MeshGeometry3D planetLOD2Mesh = CreatePlanetGeometry(5);
+        static MeshGeometry3D planetLOD3Mesh = CreatePlanetGeometry(3);
+        static MeshGeometry3D planetLOD4Mesh = CreatePlanetGeometry(2);
+
         public static MeshGeometry3D CreatePlanetGeometry(int lod)
         {
             return CreateSphereMesh(1, lod, (int)(lod * 1.5f + 0.5f));
         }
 
-        public static GeometryModel3D CreatePlanetGeometryModel(Color planetColor, int lod)
+        public static GeometryModel3D CreatePlanetGeometryModel(Color planetColor, LOD lod)
         {
-            MeshGeometry3D planetMesh = CreatePlanetGeometry(lod);
+            //MeshGeometry3D planetMesh = CreatePlanetGeometry(lod);
+            MeshGeometry3D planetMesh;
+            switch (lod)
+            {
+                case LOD.ZERO:
+                    planetMesh = planetLOD0Mesh.Clone();
+                    break;
+                case LOD.ONE:
+                    planetMesh = planetLOD1Mesh.Clone();
+                    break;
+                case LOD.TWO:
+                    planetMesh = planetLOD2Mesh.Clone();
+                    break;
+                case LOD.THREE:
+                    planetMesh = planetLOD3Mesh.Clone();
+                    break;
+                case LOD.FOUR:
+                    planetMesh = planetLOD4Mesh.Clone();
+                    break;
+                default:
+                    planetMesh = planetLOD4Mesh.Clone();
+                    break;
+            }
 
             Material material = new DiffuseMaterial(new SolidColorBrush(planetColor));
             GeometryModel3D planetModel = new GeometryModel3D(planetMesh, material);
