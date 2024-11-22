@@ -28,10 +28,10 @@
             <local:MouseEventArgsCommandAction Command="{Binding MouseMoveCommand}"/>
         </i:EventTrigger>
         <i:EventTrigger EventName="Closed">
-            <i:InvokeCommandAction Command="{Binding MainWindowClosed}"/>
+            <i:InvokeCommandAction Command="{Binding MainWindowClosedCommand}"/>
         </i:EventTrigger>
         <i:EventTrigger EventName="Deactivated">
-            <i:InvokeCommandAction Command="{Binding MainWindowDeactivated}"/>
+            <i:InvokeCommandAction Command="{Binding MainWindowDeactivatedCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid Background="Black">

@@ -1,11 +1,11 @@
-﻿using System.Numerics;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 namespace PlanetSimulationCW.Model
 {
-    class Planet
+    public class Planet
     {
+        public Guid Id { get; private set; }
         public Vector3D Position { get; private set; }
         public Vector3D Velocity { get; private set; }
         public double Mass { get; private set; }
@@ -14,13 +14,48 @@ namespace PlanetSimulationCW.Model
 
         public bool Destroyed { get; private set; }
 
+        public PlanetDBEntry PlanetDBEntry
+        {
+            get
+            {
+                PlanetDBEntry dbEntry = new PlanetDBEntry();
+
+                dbEntry.Id = Id;
+                dbEntry.PositionX = Position.X;
+                dbEntry.PositionY = Position.Y;
+                dbEntry.PositionZ = Position.Z;
+                dbEntry.Mass = Mass;
+                dbEntry.Radius = Radius;
+                dbEntry.VelocityX = Velocity.X;
+                dbEntry.VelocityY = Velocity.Y;
+                dbEntry.VelocityZ = Velocity.Z;
+                dbEntry.ColorR = Color.R;
+                dbEntry.ColorG = Color.G;
+                dbEntry.ColorB = Color.B;
+
+                return dbEntry;
+            }
+        }
+
         public Planet(Vector3D position, double mass, double radius, Color color)
         {
+            Id = Guid.NewGuid();
             Position = position;
             Mass = mass;
             Radius = radius;
             Velocity = new Vector3D(0, 0, 0);
             Color = color;
+        }
+
+        // Инициализация при помощи загруженных из бд данных
+        public Planet(PlanetDBEntry dbEntry)
+        {
+            Id = dbEntry.Id;
+            Position = new Vector3D(dbEntry.PositionX, dbEntry.PositionY, dbEntry.PositionZ);
+            Mass = dbEntry.Mass;
+            Radius = dbEntry.Radius;
+            Velocity = new Vector3D(dbEntry.VelocityX, dbEntry.VelocityY, dbEntry.VelocityZ);
+            Color = Color.FromArgb(255, dbEntry.ColorR, dbEntry.ColorG, dbEntry.ColorB);
         }
 
         public void Collide(Planet otherPlanet)

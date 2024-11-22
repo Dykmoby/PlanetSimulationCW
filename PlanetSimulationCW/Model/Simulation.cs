@@ -5,6 +5,16 @@ namespace PlanetSimulationCW.Model
 {
     class Simulation
     {
+        private static Simulation instance;
+        public static Simulation Instance
+        {
+            get
+            {
+                instance ??= new Simulation();
+                return instance;
+            }
+        }
+
         public const double G = 6.6743015E-11;
         public const double THETA = 0.35;
         public const int SPEED_OF_LIGHT = 299792458;
@@ -14,12 +24,15 @@ namespace PlanetSimulationCW.Model
 
         private double simulationSpeedMultiplier = 10000000000;
 
-        public Simulation(int planetCount)
+        public Simulation()
         {
             octree = new Octree(new Vector3D(0, 0, 0), octreeMaxSize);
             planets = new List<Planet>();
-            Random rand = new Random();
+        }
 
+        public void AddPlanets(int planetCount)
+        {
+            Random rand = new Random();
             for (int i = 0; i < planetCount; i++)
             {
                 Vector3D planetPosition = new Vector3D(rand.Next(-2000, 2000), rand.Next(-2000, 2000), rand.Next(-2000, 2000));
@@ -29,6 +42,20 @@ namespace PlanetSimulationCW.Model
                 //Color color = Color.FromArgb(255, 255, 255, 255);
 
                 planets.Add(new Planet(planetPosition, planetMass, planetRadius, color));
+            }
+        }
+
+        public void LoadPlanetsFromDB(bool clearExistingPlanets = true)
+        {
+            if (clearExistingPlanets)
+            {
+                planets.Clear();
+            }
+
+            List<PlanetDBEntry> planetDBEntries = Global.db!.Planets.Local.ToList();
+            foreach (PlanetDBEntry planetDBEntry in planetDBEntries)
+            {
+                planets.Add(new Planet(planetDBEntry));
             }
         }
 

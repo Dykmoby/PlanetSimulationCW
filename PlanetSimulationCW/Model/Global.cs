@@ -4,5 +4,6 @@
     {
         public static bool simulationStopped = false;
         public static ControlPanelWindow? controlPanelWindow;
+        public static ApplicationContext? db;
     }
 }

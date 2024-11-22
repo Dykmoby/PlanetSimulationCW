@@ -31,8 +31,6 @@ namespace PlanetSimulationCW.ViewModel
         private Stopwatch frameStopwatch = new Stopwatch();
         private Stopwatch deltaTimeStopwatch = new Stopwatch();
 
-        Simulation simulation;
-
         private Model3DGroup modelGroup;
         private PerspectiveCamera camera;
         private Viewport3D viewport;
@@ -76,8 +74,8 @@ namespace PlanetSimulationCW.ViewModel
         public RelayCommand<MouseButtonEventArgs> MouseLeftButtonUpCommand { get; private set; }
         public RelayCommand<KeyEventArgs> KeyDownCommand { get; private set; }
         public RelayCommand<KeyEventArgs> KeyUpCommand { get; private set; }
-        public RelayCommand MainWindowClosed { get; private set; }
-        public RelayCommand MainWindowDeactivated { get; private set; }
+        public RelayCommand MainWindowClosedCommand { get; private set; }
+        public RelayCommand MainWindowDeactivatedCommand { get; private set; }
 
         public MainVM(Viewport3D viewport)
         {
@@ -85,7 +83,7 @@ namespace PlanetSimulationCW.ViewModel
             Global.controlPanelWindow = new ControlPanelWindow();
             Global.controlPanelWindow.Show();
 
-            simulation = new Simulation(1000);
+            Simulation.Instance.AddPlanets(800);
 
             Camera = new PerspectiveCamera();
             Camera.Position = new Point3D(0, 0, 0);
@@ -104,8 +102,8 @@ namespace PlanetSimulationCW.ViewModel
             MouseLeftButtonUpCommand = new RelayCommand<MouseButtonEventArgs>(OnMouseLeftButtonUp);
             KeyDownCommand = new RelayCommand<KeyEventArgs>(OnKeyDown);
             KeyUpCommand = new RelayCommand<KeyEventArgs>(OnKeyUp);
-            MainWindowClosed = new RelayCommand(obj => { Application.Current.Shutdown(0); });
-            MainWindowDeactivated = new RelayCommand(obj => { pressedKeys.Clear(); });
+            MainWindowClosedCommand = new RelayCommand(obj => { Application.Current.Shutdown(0); });
+            MainWindowDeactivatedCommand = new RelayCommand(obj => { pressedKeys.Clear(); });
         }
 
         private void OnMouseRightButtonDown(MouseButtonEventArgs e)
@@ -223,9 +221,9 @@ namespace PlanetSimulationCW.ViewModel
             MoveCamera();
 
             // Отрисовка планет во View
-            ModelGroup = CreateModelGroup(simulation.planets, simulation.octree);
+            ModelGroup = CreateModelGroup(Simulation.Instance.planets, Simulation.Instance.octree);
 
-            simulation.SimulateStep(deltaTime / 1000d);
+            Simulation.Instance.SimulateStep(deltaTime / 1000d);
 
             frameTime = frameStopwatch.ElapsedMilliseconds;
             if (frameTime <= targetFrameTime)
@@ -274,7 +272,7 @@ namespace PlanetSimulationCW.ViewModel
             }
             else if (pressedKeys.Contains(Key.E))
             {
-                Console.WriteLine(simulation.planets.Capacity);
+                Console.WriteLine(Simulation.Instance.planets.Capacity);
                 moveDirection = Camera.UpDirection;
                 moveDirection.Normalize();
             }
@@ -399,7 +397,7 @@ namespace PlanetSimulationCW.ViewModel
             Planet? closestPlanet = null;
             double closestDistance = double.MaxValue;
 
-            foreach (Planet planet in simulation.octree.FindNearestPlanets((Vector3D)Camera.Position, maxRaycastDistance))
+            foreach (Planet planet in Simulation.Instance.octree.FindNearestPlanets((Vector3D)Camera.Position, maxRaycastDistance))
             {
                 double distance;
                 if (RayPlanetIntersection(ray, planet, out distance))
