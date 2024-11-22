@@ -30,6 +30,9 @@
         <i:EventTrigger EventName="Closed">
             <i:InvokeCommandAction Command="{Binding MainWindowClosed}"/>
         </i:EventTrigger>
+        <i:EventTrigger EventName="Deactivated">
+            <i:InvokeCommandAction Command="{Binding MainWindowDeactivated}"/>
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid Background="Black">
         <Viewport3D x:Name="viewport" ClipToBounds="True" Camera="{Binding Camera}">

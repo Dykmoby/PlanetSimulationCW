@@ -77,6 +77,7 @@ namespace PlanetSimulationCW.ViewModel
         public RelayCommand<KeyEventArgs> KeyDownCommand { get; private set; }
         public RelayCommand<KeyEventArgs> KeyUpCommand { get; private set; }
         public RelayCommand MainWindowClosed { get; private set; }
+        public RelayCommand MainWindowDeactivated { get; private set; }
 
         public MainVM(Viewport3D viewport)
         {
@@ -104,6 +105,7 @@ namespace PlanetSimulationCW.ViewModel
             KeyDownCommand = new RelayCommand<KeyEventArgs>(OnKeyDown);
             KeyUpCommand = new RelayCommand<KeyEventArgs>(OnKeyUp);
             MainWindowClosed = new RelayCommand(obj => { Application.Current.Shutdown(0); });
+            MainWindowDeactivated = new RelayCommand(obj => { pressedKeys.Clear(); });
         }
 
         private void OnMouseRightButtonDown(MouseButtonEventArgs e)
