@@ -29,11 +29,22 @@ namespace PlanetSimulationCW.ViewModel
         }
 
         public RelayCommand ToggleSimulationCommand { get; private set; }
+        public RelayCommand ControlPanelClosed { get; private set; }
 
         public ControlPanelVM()
         {
             ToggleSimulationCommand = new RelayCommand(ToggleSimulation);
-            PauseButtonText = "Pause";
+            ControlPanelClosed = new RelayCommand(Close);
+
+
+            if (Global.simulationStopped)
+            {
+                PauseButtonText = "Resume";
+            }
+            else
+            {
+                PauseButtonText = "Pause";
+            }
         }
 
         private void ToggleSimulation(object e)
@@ -47,6 +58,11 @@ namespace PlanetSimulationCW.ViewModel
             {
                 PauseButtonText = "Pause";
             }
+        }
+
+        private void Close(object e)
+        {
+            Global.controlPanelWindow = null;
         }
 
         public void DisplayPlanetInfo(Planet planet)

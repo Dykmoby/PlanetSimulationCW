@@ -148,11 +148,11 @@ namespace PlanetSimulationCW.ViewModel
             Planet selectedPlanet = SelectPlanet(e.GetPosition((UIElement)e.Source));
             if (selectedPlanet == null)
             {
-                ((ControlPanelVM)Global.controlPanelWindow.DataContext).ClearPlanetInfo();
+                (Global.controlPanelWindow?.DataContext as ControlPanelVM)?.ClearPlanetInfo();
                 return;
             }
 
-            ((ControlPanelVM)Global.controlPanelWindow.DataContext).DisplayPlanetInfo(selectedPlanet);
+            (Global.controlPanelWindow?.DataContext as ControlPanelVM)?.DisplayPlanetInfo(selectedPlanet);
         }
 
         private void OnKeyDown(KeyEventArgs e)
@@ -170,6 +170,15 @@ namespace PlanetSimulationCW.ViewModel
             {
                 TryResetMovementStopwatch(e.Key);
                 pressedKeys.Remove(e.Key);
+            }
+
+            if (e.Key == Key.P) // Если нажата P, открыть панель управления (если она закрыта)
+            {
+                if (Global.controlPanelWindow == null)
+                {
+                    Global.controlPanelWindow = new ControlPanelWindow();
+                    Global.controlPanelWindow.Show();
+                }
             }
         }
 
