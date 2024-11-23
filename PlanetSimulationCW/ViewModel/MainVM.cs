@@ -23,7 +23,6 @@ namespace PlanetSimulationCW.ViewModel
         private bool rightMouseDown = false;
         private readonly Key[] movementKeys = { Key.W, Key.A, Key.S, Key.D, Key.Q, Key.E };
         private bool renderOctants = false;
-        private long targetFrameTime = 16; // 60 fps
         private long frameTime = 0; // Время в миллисекундах, за которое отрисовался текущий кадр (без дополнительного ожидания после отрисовки)
         private long deltaTime = 0; // Время между прошлым и текущим кадром в миллисекундах
 
@@ -226,9 +225,9 @@ namespace PlanetSimulationCW.ViewModel
             Simulation.Instance.SimulateStep(deltaTime / 1000d);
 
             frameTime = frameStopwatch.ElapsedMilliseconds;
-            if (frameTime <= targetFrameTime)
+            if (Global.fpsLocked && frameTime <= Global.targetFrameTime)
             {
-                Thread.Sleep((int)(targetFrameTime - frameTime));
+                Thread.Sleep((int)(Global.targetFrameTime - frameTime));
             }
 
             //Log = (1000 / frameStopwatch.ElapsedMilliseconds).ToString();
