@@ -1,0 +1,47 @@
+﻿<Window x:Class="PlanetSimulationCW.View.EditPlanetWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PlanetSimulationCW.View"
+        mc:Ignorable="d"
+        Title="EditPlanetWindow" Height="450" Width="450">
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Position" Grid.Column="0"/>
+                <TextBox Text="{Binding PositionX, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="1"/>
+                <TextBox Text="{Binding PositionY, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="2"/>
+                <TextBox Text="{Binding PositionZ, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="3"/>
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Velocity" Grid.Column="0"/>
+                <TextBox Text="{Binding VelocityX, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="1"/>
+                <TextBox Text="{Binding VelocityY, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="2"/>
+                <TextBox Text="{Binding VelocityZ, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="3"/>
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Content="Cancel" Margin="5,5,5,5" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
+                <Button Content="Apply" Margin="5,5,5,5" Command="{Binding ApplyCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="1"/>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Window>

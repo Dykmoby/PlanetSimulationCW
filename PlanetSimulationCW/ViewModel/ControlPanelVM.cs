@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
 using PlanetSimulationCW.Model;
+using PlanetSimulationCW.View;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -57,12 +58,27 @@ namespace PlanetSimulationCW.ViewModel
             }
         }
 
+        private bool editPlanetButtonEnabled;
+        public bool EditPlanetButtonEnabled
+        {
+            get { return editPlanetButtonEnabled; }
+            set
+            {
+                editPlanetButtonEnabled = value;
+                OnPropertyChanged(nameof(EditPlanetButtonEnabled));
+            }
+        }
+
         public RelayCommand ToggleSimulationCommand { get; private set; }
         public RelayCommand ToggleFPSLockCommand { get; private set; }
         public RelayCommand<KeyEventArgs> FpsLockTextBoxKeyUpCommand { get; private set; }
         public RelayCommand LoadDBCommand { get; private set; }
         public RelayCommand SaveDBCommand { get; private set; }
         public RelayCommand ControlPanelClosedCommand { get; private set; }
+        public RelayCommand EditPlanetCommand { get; private set; }
+
+
+        public Planet? selectedPlanet;
 
         public ControlPanelVM()
         {
@@ -72,6 +88,7 @@ namespace PlanetSimulationCW.ViewModel
             LoadDBCommand = new RelayCommand(LoadDB);
             SaveDBCommand = new RelayCommand(SaveDB);
             ControlPanelClosedCommand = new RelayCommand(Close);
+            EditPlanetCommand = new RelayCommand(EditPlanet);
 
 
             if (Global.simulationStopped)
@@ -83,6 +100,24 @@ namespace PlanetSimulationCW.ViewModel
                 ToggleFPSLockButtonText = "Unlock FPS";
             else
                 ToggleFPSLockButtonText = "Lock FPS";
+        }
+
+        private void EditPlanet(object e)
+        {
+            if (selectedPlanet == null)
+                return;
+
+            Global.simulationStopped = true;
+
+            EditPlanetVM editPlanetVM = new EditPlanetVM(selectedPlanet);
+            EditPlanetWindow editPlanetWindow = new EditPlanetWindow(editPlanetVM);
+            if (editPlanetWindow.ShowDialog() == true)
+            {
+                selectedPlanet.Position = new Vector3D(double.Parse(editPlanetVM.PositionX), double.Parse(editPlanetVM.PositionY), double.Parse(editPlanetVM.PositionZ));
+                selectedPlanet.Velocity = new Vector3D(double.Parse(editPlanetVM.VelocityX), double.Parse(editPlanetVM.VelocityY), double.Parse(editPlanetVM.VelocityZ));
+            }
+
+            Global.simulationStopped = false;
         }
 
         private void ToggleSimulation(object e)
@@ -188,11 +223,15 @@ namespace PlanetSimulationCW.ViewModel
 
         public void DisplayPlanetInfo(Planet planet)
         {
-            PlanetInfoText = planet.Color.ToString();
+            selectedPlanet = planet;
+            EditPlanetButtonEnabled = true;
+            PlanetInfoText = selectedPlanet.Color.ToString() + '\n';
         }
 
         public void ClearPlanetInfo()
         {
+            selectedPlanet = null;
+            EditPlanetButtonEnabled = false;
             PlanetInfoText = "";
         }
     }

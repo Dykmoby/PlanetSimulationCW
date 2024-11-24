@@ -35,8 +35,6 @@ namespace PlanetSimulationCW.ViewModel
         private Viewport3D viewport;
         private string log;
 
-        private Point selMousePos;
-
         public Model3DGroup ModelGroup
         {
             get { return modelGroup; }
@@ -114,7 +112,6 @@ namespace PlanetSimulationCW.ViewModel
 
         private void OnMouseMove(MouseEventArgs e)
         {
-            selMousePos = e.GetPosition((UIElement)e.Source);
             if (rightMouseDown == true)
             {
                 Point currentMousePos = e.GetPosition((UIElement)e.Source);

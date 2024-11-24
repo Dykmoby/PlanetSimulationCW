@@ -1,5 +1,4 @@
 ﻿<Window x:Class="PlanetSimulationCW.ControlPanelWindow"
-        x:Name="controlPanelWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -38,10 +37,15 @@
                 </TextBox>
             </Grid>
         </StackPanel>
-        <StackPanel Orientation="Vertical" Grid.Row="1">
-            <Rectangle Stroke="Black"/>
-            <Label Grid.Row="1" Content="Selected planet info:"/>
-            <TextBlock Grid.Row="1" Text="{Binding PlanetInfoText}" Margin="5, 5, 5, 5"/>
-        </StackPanel>
+        <Rectangle Stroke="Black" Grid.Row="1"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="1" Content="Selected planet info:" Grid.Column="0" Height="30" VerticalAlignment="Top"/>
+            <Button Content="Edit" Height="20.5" VerticalAlignment="Top" Margin="5,5,5,5" Command="{Binding EditPlanetCommand}" Grid.Column="1" IsEnabled="{Binding EditPlanetButtonEnabled}"/>
+        </Grid>
+        <ScrollViewer Grid.Row="1" Content="{Binding PlanetInfoText}" Margin="5, 30, 5, 5" Height="Auto"/>
     </Grid>
 </Window>

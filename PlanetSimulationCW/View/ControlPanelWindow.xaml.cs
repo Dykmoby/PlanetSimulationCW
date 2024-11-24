@@ -8,7 +8,7 @@ namespace PlanetSimulationCW
         public ControlPanelWindow()
         {
             InitializeComponent();
-            controlPanelWindow.DataContext = new ControlPanelVM();
+            DataContext = new ControlPanelVM();
         }
     }
 }

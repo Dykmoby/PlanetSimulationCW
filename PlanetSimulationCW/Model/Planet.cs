@@ -6,11 +6,11 @@ namespace PlanetSimulationCW.Model
     public class Planet
     {
         public Guid Id { get; private set; }
-        public Vector3D Position { get; private set; }
-        public Vector3D Velocity { get; private set; }
-        public double Mass { get; private set; }
-        public double Radius { get; private set; }
-        public Color Color { get; private set; }
+        public Vector3D Position { get; set; }
+        public Vector3D Velocity { get; set; }
+        public double Mass { get; set; }
+        public double Radius { get; set; }
+        public Color Color { get; set; }
 
         public bool Destroyed { get; private set; }
 
@@ -72,11 +72,6 @@ namespace PlanetSimulationCW.Model
         public void AddVelocity(Vector3D addVelocity)
         {
             Velocity += addVelocity;
-        }
-
-        public void SetVelocity(Vector3D setVelocity)
-        {
-            Velocity = setVelocity;
         }
 
         public void Move(double deltaTime)

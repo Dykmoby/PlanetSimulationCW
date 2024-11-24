@@ -8,7 +8,7 @@ namespace PlanetSimulationCW
         public MainWindow()
         {
             InitializeComponent();
-            mainWindow.DataContext = new MainVM(viewport);
+            DataContext = new MainVM(viewport);
         }
     }
 }
