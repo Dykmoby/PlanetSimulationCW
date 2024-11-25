@@ -53,7 +53,7 @@ namespace PlanetSimulationCW.Model
 
                         if (distanceSqr < Math.Pow(planets[i].Radius + planet.Radius, 2))
                         {
-                            if (planets[i].Mass > planet.Mass)
+                            if (planets[i].Mass < planet.Mass)
                             {
                                 planet.Collide(planets[i]);
                                 continue;

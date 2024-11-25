@@ -452,24 +452,35 @@ namespace PlanetSimulationCW.ViewModel
         {
             Vector3D dir = planet.Position - (Vector3D)Camera.Position;
             double distanceSqr = Vector3D.DotProduct(dir, dir);
-            if (distanceSqr >= 0 && distanceSqr < 10000) // LOD 0
+            distanceSqr /= planet.Radius;
+            if (distanceSqr < 10000) // LOD 0
             {
+                if (Global.showColorLODS)
+                    planet.Color = Color.FromArgb(255, 255, 125, 0);
                 return MeshUtils.LOD.ZERO;
             }
             else if (distanceSqr >= 10000 && distanceSqr < 90000) // LOD 1
             {
+                if (Global.showColorLODS)
+                    planet.Color = Color.FromArgb(255, 180, 255, 0);
                 return MeshUtils.LOD.ONE;
             }
             else if (distanceSqr >= 90000 && distanceSqr < 1000000) // LOD 2
             {
+                if (Global.showColorLODS)
+                    planet.Color = Color.FromArgb(255, 50, 180, 180);
                 return MeshUtils.LOD.TWO;
             }
             else if (distanceSqr >= 1000000 && distanceSqr < 9000000) // LOD 3
             {
+                if (Global.showColorLODS)
+                    planet.Color = Color.FromArgb(255, 15, 30, 255);
                 return MeshUtils.LOD.THREE;
             }
             else if (distanceSqr >= 9000000 && distanceSqr < 2500000000) // LOD 4
             {
+                if (Global.showColorLODS)
+                    planet.Color = Color.FromArgb(255, 180, 255, 255);
                 return MeshUtils.LOD.FOUR;
             }
             else if (distanceSqr >= 2500000000) // LOD 5 (NO RENDER)

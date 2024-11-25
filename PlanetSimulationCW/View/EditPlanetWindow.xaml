@@ -39,6 +39,37 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
+                <Label Content="Mass" Grid.Column="0"/>
+                <TextBox Text="{Binding Mass, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="1"/>
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Radius" Grid.Column="0"/>
+                <TextBox Text="{Binding Radius, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="1"/>
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Color" Grid.Column="0"/>
+                <TextBox Text="{Binding ColorR, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="1"/>
+                <TextBox Text="{Binding ColorG, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="2"/>
+                <TextBox Text="{Binding ColorB, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="3"/>
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
                 <Button Content="Cancel" Margin="5,5,5,5" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
                 <Button Content="Apply" Margin="5,5,5,5" Command="{Binding ApplyCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="1"/>
             </Grid>

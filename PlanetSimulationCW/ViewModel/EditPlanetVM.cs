@@ -73,6 +73,61 @@ namespace PlanetSimulationCW.ViewModel
             }
         }
 
+        private string mass;
+        public string Mass
+        {
+            get { return mass; }
+            set
+            {
+                mass = value;
+                OnPropertyChanged(nameof(Mass));
+            }
+        }
+
+        private string radius;
+        public string Radius
+        {
+            get { return radius; }
+            set
+            {
+                radius = value;
+                OnPropertyChanged(nameof(Radius));
+            }
+        }
+
+        private string colorR;
+        public string ColorR
+        {
+            get { return colorR; }
+            set
+            {
+                colorR = value;
+                OnPropertyChanged(nameof(ColorR));
+            }
+        }
+
+        private string colorG;
+        public string ColorG
+        {
+            get { return colorG; }
+            set
+            {
+                colorG = value;
+                OnPropertyChanged(nameof(ColorG));
+            }
+        }
+
+        private string colorB;
+        public string ColorB
+        {
+            get { return colorB; }
+            set
+            {
+                colorB = value;
+                OnPropertyChanged(nameof(ColorB));
+            }
+        }
+
         public RelayCommand CancelCommand { get; private set; }
         public RelayCommand ApplyCommand { get; private set; }
 
@@ -90,6 +145,13 @@ namespace PlanetSimulationCW.ViewModel
             VelocityX = planet.Velocity.X.ToString("0.##");
             VelocityY = planet.Velocity.Y.ToString("0.##");
             VelocityZ = planet.Velocity.Z.ToString("0.##");
+
+            Mass = planet.Mass.ToString("0.##");
+            Radius = planet.Radius.ToString("0.##");
+
+            ColorR = planet.Color.R.ToString();
+            ColorG = planet.Color.G.ToString();
+            ColorB = planet.Color.B.ToString();
         }
 
         private void Cancel(object e)
@@ -130,6 +192,18 @@ namespace PlanetSimulationCW.ViewModel
             if (!double.TryParse(VelocityZ, out double _))
             {
                 incorrectValuesMessage += nameof(VelocityZ) + '\n';
+                incorrectValuesCount++;
+            }
+
+            if (!double.TryParse(Mass, out double _))
+            {
+                incorrectValuesMessage += nameof(Mass) + '\n';
+                incorrectValuesCount++;
+            }
+
+            if (!double.TryParse(Radius, out double _))
+            {
+                incorrectValuesMessage += nameof(Radius) + '\n';
                 incorrectValuesCount++;
             }
 

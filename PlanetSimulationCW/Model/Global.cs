@@ -4,6 +4,7 @@
     {
         public static bool simulationStopped = false;
         public static bool fpsLocked = false;
+        public static bool showColorLODS = false;
         public static long targetFrameTime;
         public static ControlPanelWindow? controlPanelWindow;
         public static ApplicationContext? db;

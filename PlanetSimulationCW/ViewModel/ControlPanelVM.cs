@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 namespace PlanetSimulationCW.ViewModel
@@ -115,6 +116,9 @@ namespace PlanetSimulationCW.ViewModel
             {
                 selectedPlanet.Position = new Vector3D(double.Parse(editPlanetVM.PositionX), double.Parse(editPlanetVM.PositionY), double.Parse(editPlanetVM.PositionZ));
                 selectedPlanet.Velocity = new Vector3D(double.Parse(editPlanetVM.VelocityX), double.Parse(editPlanetVM.VelocityY), double.Parse(editPlanetVM.VelocityZ));
+                selectedPlanet.Mass = double.Parse(editPlanetVM.Mass);
+                selectedPlanet.Radius = double.Parse(editPlanetVM.Radius);
+                selectedPlanet.Color = Color.FromRgb(byte.Parse(editPlanetVM.ColorR), byte.Parse(editPlanetVM.ColorG), byte.Parse(editPlanetVM.ColorB));
             }
 
             Global.simulationStopped = false;
