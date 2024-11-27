@@ -37,6 +37,8 @@ namespace PlanetSimulationCW.Model
             {
                 Vector3D planetPosition = new Vector3D(rand.Next(-2000, 2000), rand.Next(-2000, 2000), rand.Next(-2000, 2000));
                 double planetRadius = rand.Next(10, 50) / 10.0f;
+                if (rand.Next(0, 1000) > 990)
+                    planetRadius *= 20;
                 double planetMass = 4 / 3 * Math.PI * Math.Pow(planetRadius, 3);
                 Color color = Color.FromArgb(255, (byte)rand.Next(0, 255), (byte)rand.Next(0, 255), (byte)rand.Next(0, 255));
                 //Color color = Color.FromArgb(255, 255, 255, 255);
