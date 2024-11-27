@@ -26,6 +26,17 @@ namespace PlanetSimulationCW.ViewModel
             }
         }
 
+        private string followPlanetButtonText;
+        public string FollowPlanetButtonText
+        {
+            get { return followPlanetButtonText; }
+            set
+            {
+                followPlanetButtonText = value;
+                OnPropertyChanged(nameof(FollowPlanetButtonText));
+            }
+        }
+
         private string toggleFPSLockButtonText;
         public string ToggleFPSLockButtonText
         {
@@ -99,6 +110,11 @@ namespace PlanetSimulationCW.ViewModel
             else
                 PauseButtonText = "Pause";
 
+            if (Global.followPlanet)
+                FollowPlanetButtonText = "Unfollow";
+            else
+                FollowPlanetButtonText = "Follow";
+
             if (Global.fpsLocked)
                 ToggleFPSLockButtonText = "Unlock FPS";
             else
@@ -138,8 +154,16 @@ namespace PlanetSimulationCW.ViewModel
             if (selectedPlanet == null)
                 return;
 
+            if (Global.followPlanet)
+            {
+                Global.followPlanet = false;
+                FollowPlanetButtonText = "Follow";
+                return;
+            }
+
             Global.setCameraDeltaPos!.Invoke();
             Global.followPlanet = true;
+            FollowPlanetButtonText = "Unfollow";
         }
 
         private void ToggleSimulation(object e)
@@ -246,6 +270,7 @@ namespace PlanetSimulationCW.ViewModel
         public void DisplayPlanetInfo(Planet planet)
         {
             selectedPlanet = planet;
+            FollowPlanetButtonText = "Follow";
             PlanetButtonsEnabled = true;
             PlanetInfoText = selectedPlanet.Color.ToString() + '\n';
         }
@@ -253,6 +278,7 @@ namespace PlanetSimulationCW.ViewModel
         public void ClearPlanetInfo()
         {
             selectedPlanet = null;
+            FollowPlanetButtonText = "Follow";
             PlanetButtonsEnabled = false;
             PlanetInfoText = "";
         }

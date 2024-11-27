@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PlanetSimulationCW"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="Control Panel" Height="450" Width="250">
+        Title="Control Panel" Height="450" Width="300">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closed">
             <i:InvokeCommandAction Command="{Binding ControlPanelClosedCommand}"/>
@@ -46,7 +46,7 @@
             </Grid.ColumnDefinitions>
             <Label Grid.Row="1" Content="Selected planet info:" Grid.Column="0" Height="30" VerticalAlignment="Top"/>
             <Button Content="Edit" Height="20.5" VerticalAlignment="Top" Margin="5,5,5,5" Command="{Binding EditPlanetCommand}" Grid.Column="1" IsEnabled="{Binding PlanetButtonsEnabled}"/>
-            <Button Content="Follow" Height="20.5" VerticalAlignment="Top" Margin="5,5,5,5" Command="{Binding FollowPlanetCommand}" Grid.Column="2" IsEnabled="{Binding PlanetButtonsEnabled}"/>
+            <Button Content="{Binding FollowPlanetButtonText, FallbackValue='Follow'}" Height="20.5" VerticalAlignment="Top" Margin="5,5,5,5" Command="{Binding FollowPlanetCommand}" Grid.Column="2" IsEnabled="{Binding PlanetButtonsEnabled}"/>
         </Grid>
         <ScrollViewer Grid.Row="1" Content="{Binding PlanetInfoText}" Margin="5, 30, 5, 5" Height="Auto"/>
     </Grid>
