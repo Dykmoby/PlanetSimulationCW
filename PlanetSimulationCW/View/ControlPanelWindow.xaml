@@ -36,6 +36,57 @@
                     </i:Interaction.Triggers>
                 </TextBox>
             </Grid>
+
+            <Label Content="Simulation speed (min, max):" HorizontalAlignment="Center"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBox Text="{Binding SimulationSpeedMinBase, FallbackValue='1'}" Margin="5,5,5,5" Grid.Column="0">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyUp">
+                            <local:KeyEventArgsCommandAction Command="{Binding SimulationSpeedTextBoxKeyUpCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
+                <Label Content="* 10^" HorizontalAlignment="Center" Grid.Column="1"/>
+                <TextBox Text="{Binding SimulationSpeedMinPow, FallbackValue='0'}" Margin="5,5,5,5" Grid.Column="2">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyUp">
+                            <local:KeyEventArgsCommandAction Command="{Binding SimulationSpeedTextBoxKeyUpCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
+
+                <Label Content="-" HorizontalAlignment="Center" Grid.Column="3"/>
+
+                <TextBox Text="{Binding SimulationSpeedMaxBase, FallbackValue='0'}" Margin="5,5,5,5" Grid.Column="4">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyUp">
+                            <local:KeyEventArgsCommandAction Command="{Binding SimulationSpeedTextBoxKeyUpCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
+                <Label Content="* 10^" HorizontalAlignment="Center" Grid.Column="5"/>
+                <TextBox Text="{Binding SimulationSpeedMaxPow, FallbackValue='0'}" Margin="5,5,5,5" Grid.Column="6">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyUp">
+                            <local:KeyEventArgsCommandAction Command="{Binding SimulationSpeedTextBoxKeyUpCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
+            </Grid>
+
+            <Slider Value="{Binding SimulationSpeed}" Margin="5,5,5,5"/>
+
+            <Label Content="{Binding SimulationSpeedText, FallbackValue='1'}" HorizontalAlignment="Center" Margin="5,5,5,5"/>
         </StackPanel>
         <Rectangle Stroke="Black" Grid.Row="1"/>
         <Grid Grid.Row="1">

@@ -81,9 +81,116 @@ namespace PlanetSimulationCW.ViewModel
             }
         }
 
+        private string simulationSpeedMinBase;
+        public string SimulationSpeedMinBase
+        {
+            get { return simulationSpeedMinBase; }
+            set
+            {
+                if (int.TryParse(value, out int simSpeedMinBase))
+                {
+                    simulationSpeedMinBase = value;
+                    simulationSpeedSliderValueMin = simSpeedMinBase * Math.Pow(10, int.Parse(SimulationSpeedMinPow));
+                    OnPropertyChanged(nameof(SimulationSpeedMinBase));
+                }
+                else
+                {
+                    MessageBox.Show("Incorrect value");
+                }
+            }
+        }
+
+        private string simulationSpeedMaxBase;
+        public string SimulationSpeedMaxBase
+        {
+            get { return simulationSpeedMaxBase; }
+            set
+            {
+                if (int.TryParse(value, out int simSpeedMaxBase))
+                {
+                    simulationSpeedMaxBase = value;
+                    simulationSpeedSliderValueMax = simSpeedMaxBase * Math.Pow(10, int.Parse(SimulationSpeedMaxPow));
+                    OnPropertyChanged(nameof(SimulationSpeedMaxBase));
+                }
+                else
+                {
+                    MessageBox.Show("Incorrect value");
+                }
+            }
+        }
+
+        private string simulationSpeedMinPow;
+        public string SimulationSpeedMinPow
+        {
+            get { return simulationSpeedMinPow; }
+            set
+            {
+                if (int.TryParse(value, out int simSpeedMinPow))
+                {
+                    simulationSpeedMinPow = value;
+                    simulationSpeedSliderValueMin = int.Parse(SimulationSpeedMinBase) * Math.Pow(10, simSpeedMinPow);
+                    OnPropertyChanged(nameof(SimulationSpeedMinPow));
+                }
+                else
+                {
+                    MessageBox.Show("Incorrect value");
+                }
+            }
+        }
+
+        private string simulationSpeedMaxPow;
+        public string SimulationSpeedMaxPow
+        {
+            get { return simulationSpeedMaxPow; }
+            set
+            {
+                if (int.TryParse(value, out int simSpeedMaxPow))
+                {
+                    simulationSpeedMaxPow = value;
+                    simulationSpeedSliderValueMax = int.Parse(SimulationSpeedMaxBase) * Math.Pow(10, simSpeedMaxPow);
+                    OnPropertyChanged(nameof(SimulationSpeedMaxPow));
+                }
+                else
+                {
+                    MessageBox.Show("Incorrect value");
+                }
+            }
+        }
+
+        private double simulationSpeedSliderValueMin;
+
+        private double simulationSpeedSliderValueMax;
+
+        private double simulationSpeed;
+        public double SimulationSpeed
+        {
+            get { return simulationSpeed; }
+            set
+            {
+                simulationSpeed = value;
+                double simSpeed = MathUtils.Linear(0, 10, value, simulationSpeedSliderValueMin, simulationSpeedSliderValueMax);
+                SimulationSpeedText = simSpeed.ToString();
+                Simulation.Instance.simulationSpeedMultiplier = simSpeed;
+                OnPropertyChanged(nameof(SimulationSpeed));
+            }
+        }
+
+        private string simulationSpeedText;
+        public string SimulationSpeedText
+        {
+            get { return simulationSpeedText; }
+            set
+            {
+                simulationSpeedText = value;
+                OnPropertyChanged(nameof(SimulationSpeedText));
+            }
+        }
+
+
         public RelayCommand ToggleSimulationCommand { get; private set; }
         public RelayCommand ToggleFPSLockCommand { get; private set; }
         public RelayCommand<KeyEventArgs> FpsLockTextBoxKeyUpCommand { get; private set; }
+        public RelayCommand<KeyEventArgs> SimulationSpeedTextBoxKeyUpCommand { get; private set; }
         public RelayCommand LoadDBCommand { get; private set; }
         public RelayCommand SaveDBCommand { get; private set; }
         public RelayCommand ControlPanelClosedCommand { get; private set; }
@@ -98,6 +205,7 @@ namespace PlanetSimulationCW.ViewModel
             ToggleSimulationCommand = new RelayCommand(ToggleSimulation);
             ToggleFPSLockCommand = new RelayCommand(LockFPS);
             FpsLockTextBoxKeyUpCommand = new RelayCommand<KeyEventArgs>(FpsLockTextBoxKeyUp);
+            SimulationSpeedTextBoxKeyUpCommand = new RelayCommand<KeyEventArgs>(SimulationSpeedTextBoxKeyUp);
             LoadDBCommand = new RelayCommand(LoadDB);
             SaveDBCommand = new RelayCommand(SaveDB);
             ControlPanelClosedCommand = new RelayCommand(Close);
@@ -119,6 +227,15 @@ namespace PlanetSimulationCW.ViewModel
                 ToggleFPSLockButtonText = "Unlock FPS";
             else
                 ToggleFPSLockButtonText = "Lock FPS";
+
+            simulationSpeedMinBase = "1";
+            simulationSpeedMinPow = "0";
+            simulationSpeedMaxBase = "1";
+            simulationSpeedMaxPow = "13";
+            SimulationSpeedMinBase = "1";
+            SimulationSpeedMinPow = "0";
+            SimulationSpeedMaxBase = "1";
+            SimulationSpeedMaxPow = "13";
         }
 
         private void EditPlanet(object e)
@@ -191,6 +308,15 @@ namespace PlanetSimulationCW.ViewModel
                 BindingExpression exp = ((TextBox)e.Source).GetBindingExpression(TextBox.TextProperty);
                 exp.UpdateSource();
                 SetTargetFPS(e);
+            }
+        }
+
+        private void SimulationSpeedTextBoxKeyUp(KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                BindingExpression exp = ((TextBox)e.Source).GetBindingExpression(TextBox.TextProperty);
+                exp.UpdateSource();
             }
         }
 

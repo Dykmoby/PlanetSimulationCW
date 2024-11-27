@@ -22,7 +22,7 @@ namespace PlanetSimulationCW.Model
         public Octree octree;
         private double octreeMaxSize = 1000000;
 
-        private double simulationSpeedMultiplier = 100000000000;
+        public double simulationSpeedMultiplier = 100000000000;
 
         public Simulation()
         {
@@ -67,9 +67,9 @@ namespace PlanetSimulationCW.Model
 
             foreach (Planet planet in planets)
             {
-                Vector3D acceleration = octree.Root.GetForce(planet, THETA) / planet.Mass * simulationSpeedMultiplier;
+                Vector3D acceleration = octree.Root.GetForce(planet, THETA) / planet.Mass;
                 planet.AddVelocity(acceleration * deltaTime);
-                planet.Move(deltaTime);
+                planet.Move(deltaTime * simulationSpeedMultiplier);
             }
 
             for (int i = 0; i < planets.Count; i++)
