@@ -91,6 +91,7 @@ namespace PlanetSimulationCW.ViewModel
                 {
                     simulationSpeedMinBase = value;
                     simulationSpeedSliderValueMin = simSpeedMinBase * Math.Pow(10, int.Parse(SimulationSpeedMinPow));
+                    UpdateSimulationSpeed();
                     OnPropertyChanged(nameof(SimulationSpeedMinBase));
                 }
                 else
@@ -110,6 +111,7 @@ namespace PlanetSimulationCW.ViewModel
                 {
                     simulationSpeedMaxBase = value;
                     simulationSpeedSliderValueMax = simSpeedMaxBase * Math.Pow(10, int.Parse(SimulationSpeedMaxPow));
+                    UpdateSimulationSpeed();
                     OnPropertyChanged(nameof(SimulationSpeedMaxBase));
                 }
                 else
@@ -129,6 +131,7 @@ namespace PlanetSimulationCW.ViewModel
                 {
                     simulationSpeedMinPow = value;
                     simulationSpeedSliderValueMin = int.Parse(SimulationSpeedMinBase) * Math.Pow(10, simSpeedMinPow);
+                    UpdateSimulationSpeed();
                     OnPropertyChanged(nameof(SimulationSpeedMinPow));
                 }
                 else
@@ -148,6 +151,7 @@ namespace PlanetSimulationCW.ViewModel
                 {
                     simulationSpeedMaxPow = value;
                     simulationSpeedSliderValueMax = int.Parse(SimulationSpeedMaxBase) * Math.Pow(10, simSpeedMaxPow);
+                    UpdateSimulationSpeed();
                     OnPropertyChanged(nameof(SimulationSpeedMaxPow));
                 }
                 else
@@ -168,9 +172,7 @@ namespace PlanetSimulationCW.ViewModel
             set
             {
                 simulationSpeed = value;
-                double simSpeed = MathUtils.Linear(0, 10, value, simulationSpeedSliderValueMin, simulationSpeedSliderValueMax);
-                SimulationSpeedText = simSpeed.ToString();
-                Simulation.Instance.simulationSpeedMultiplier = simSpeed;
+                UpdateSimulationSpeed();
                 OnPropertyChanged(nameof(SimulationSpeed));
             }
         }
@@ -264,6 +266,13 @@ namespace PlanetSimulationCW.ViewModel
 
             if (startSimulationAfterPlanetEdit)
                 Global.simulationStopped = false;
+        }
+
+        private void UpdateSimulationSpeed()
+        {
+            double simSpeed = MathUtils.Linear(0, 10, SimulationSpeed, simulationSpeedSliderValueMin, simulationSpeedSliderValueMax);
+            SimulationSpeedText = simSpeed.ToString();
+            Simulation.Instance.simulationSpeedMultiplier = simSpeed;
         }
 
         private void FollowPlanet(object e)
