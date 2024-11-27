@@ -22,7 +22,7 @@ namespace PlanetSimulationCW.Model
         public Octree octree;
         private double octreeMaxSize = 1000000;
 
-        private double simulationSpeedMultiplier = 10000000000;
+        private double simulationSpeedMultiplier = 100000000000;
 
         public Simulation()
         {

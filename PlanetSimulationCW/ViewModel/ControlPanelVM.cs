@@ -59,14 +59,14 @@ namespace PlanetSimulationCW.ViewModel
             }
         }
 
-        private bool editPlanetButtonEnabled;
-        public bool EditPlanetButtonEnabled
+        private bool planetButtonsEnabled;
+        public bool PlanetButtonsEnabled
         {
-            get { return editPlanetButtonEnabled; }
+            get { return planetButtonsEnabled; }
             set
             {
-                editPlanetButtonEnabled = value;
-                OnPropertyChanged(nameof(EditPlanetButtonEnabled));
+                planetButtonsEnabled = value;
+                OnPropertyChanged(nameof(PlanetButtonsEnabled));
             }
         }
 
@@ -77,6 +77,7 @@ namespace PlanetSimulationCW.ViewModel
         public RelayCommand SaveDBCommand { get; private set; }
         public RelayCommand ControlPanelClosedCommand { get; private set; }
         public RelayCommand EditPlanetCommand { get; private set; }
+        public RelayCommand FollowPlanetCommand { get; private set; }
 
 
         public Planet? selectedPlanet;
@@ -90,6 +91,7 @@ namespace PlanetSimulationCW.ViewModel
             SaveDBCommand = new RelayCommand(SaveDB);
             ControlPanelClosedCommand = new RelayCommand(Close);
             EditPlanetCommand = new RelayCommand(EditPlanet);
+            FollowPlanetCommand = new RelayCommand(FollowPlanet);
 
 
             if (Global.simulationStopped)
@@ -108,6 +110,12 @@ namespace PlanetSimulationCW.ViewModel
             if (selectedPlanet == null)
                 return;
 
+            // Надо ли возобнавить симуляцию после закрытия диалогового окна редактирования планеты
+            // (если симуляция была остановлена до диалогового окна, то она не возобновится после его закрытия)
+            bool startSimulationAfterPlanetEdit = true;
+            if (Global.simulationStopped)
+                startSimulationAfterPlanetEdit = false;
+
             Global.simulationStopped = true;
 
             EditPlanetVM editPlanetVM = new EditPlanetVM(selectedPlanet);
@@ -121,7 +129,17 @@ namespace PlanetSimulationCW.ViewModel
                 selectedPlanet.Color = Color.FromRgb(byte.Parse(editPlanetVM.ColorR), byte.Parse(editPlanetVM.ColorG), byte.Parse(editPlanetVM.ColorB));
             }
 
-            Global.simulationStopped = false;
+            if (startSimulationAfterPlanetEdit)
+                Global.simulationStopped = false;
+        }
+
+        private void FollowPlanet(object e)
+        {
+            if (selectedPlanet == null)
+                return;
+
+            Global.setCameraDeltaPos!.Invoke();
+            Global.followPlanet = true;
         }
 
         private void ToggleSimulation(object e)
@@ -228,14 +246,14 @@ namespace PlanetSimulationCW.ViewModel
         public void DisplayPlanetInfo(Planet planet)
         {
             selectedPlanet = planet;
-            EditPlanetButtonEnabled = true;
+            PlanetButtonsEnabled = true;
             PlanetInfoText = selectedPlanet.Color.ToString() + '\n';
         }
 
         public void ClearPlanetInfo()
         {
             selectedPlanet = null;
-            EditPlanetButtonEnabled = false;
+            PlanetButtonsEnabled = false;
             PlanetInfoText = "";
         }
     }

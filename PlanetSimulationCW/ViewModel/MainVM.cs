@@ -32,8 +32,11 @@ namespace PlanetSimulationCW.ViewModel
 
         private Model3DGroup modelGroup;
         private PerspectiveCamera camera;
+        private Point3D cameraDeltaPos;
         private Viewport3D viewport;
         private string log;
+
+        private Planet selectedPlanet;
 
         public Model3DGroup ModelGroup
         {
@@ -77,6 +80,7 @@ namespace PlanetSimulationCW.ViewModel
         public MainVM(Viewport3D viewport)
         {
             this.viewport = viewport;
+            Global.setCameraDeltaPos += () => { cameraDeltaPos = (Point3D)(Camera.Position - (Point3D)selectedPlanet!.Position); };
             Global.controlPanelWindow = new ControlPanelWindow();
             Global.controlPanelWindow.Show();
 
@@ -141,7 +145,8 @@ namespace PlanetSimulationCW.ViewModel
         // Выбор планеты при помощи ЛКМ
         private void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            Planet selectedPlanet = SelectPlanet(e.GetPosition((UIElement)e.Source));
+            Global.followPlanet = false;
+            selectedPlanet = SelectPlanet(e.GetPosition((UIElement)e.Source));
             if (selectedPlanet == null)
             {
                 (Global.controlPanelWindow?.DataContext as ControlPanelVM)?.ClearPlanetInfo();
@@ -276,8 +281,18 @@ namespace PlanetSimulationCW.ViewModel
             if (moveDirection.Length > 0)
             {
                 moveDirection.Normalize();
-                Camera.Position += MathUtils.Linear(0, moveSpeedMaxTime, movementStopwatch.ElapsedMilliseconds, moveSpeedMin, moveSpeedMax) * moveDirection * deltaTime / 1000d;
+                if (Global.followPlanet)
+                {
+                    cameraDeltaPos += MathUtils.Linear(0, moveSpeedMaxTime, movementStopwatch.ElapsedMilliseconds, moveSpeedMin, moveSpeedMax) * moveDirection * deltaTime / 1000d;
+                }
+                else
+                {
+                    Camera.Position += MathUtils.Linear(0, moveSpeedMaxTime, movementStopwatch.ElapsedMilliseconds, moveSpeedMin, moveSpeedMax) * moveDirection * deltaTime / 1000d;
+                }
             }
+
+            if (Global.followPlanet)
+                Camera.Position = selectedPlanet.Position + cameraDeltaPos;
         }
 
         public Ray3D GetRayFromScreen(Point mousePosition)
@@ -285,28 +300,28 @@ namespace PlanetSimulationCW.ViewModel
             double aspect = viewport.ActualWidth / viewport.ActualHeight;
 
             Point point01 = new Point(mousePosition.X / viewport.ActualWidth, mousePosition.Y / viewport.ActualHeight);
-            
-            // NDC space
+
+            // Точка в NDC пространстве
             var pointNormalized = new Point3D(
                 (2.0 * point01.X - 1.0),
                 -(2.0 * point01.Y - 1.0),
                 0
             );
 
-            // Get Camera Matrices
+            // Получаем матрицы камеры
             Matrix3D viewMatrix = GetViewMatrix(camera);
             Matrix3D projectionMatrix = GetProjectionMatrix(camera, aspect);
 
             Matrix3D viewProjectionMatrix = viewMatrix * projectionMatrix;
             viewProjectionMatrix.Invert();
 
-            // Get Points on near and far frustum planes on frustum
+            // Точки для вычисления на near и far frustum planes
             pointNormalized.Z = 0.0;
             Point3D nearPoint = viewProjectionMatrix.Transform(pointNormalized);
             pointNormalized.Z = 1.0;
             Point3D farPoint = viewProjectionMatrix.Transform(pointNormalized);
 
-            // Create ray
+            // Создаем луч
             Point3D rayOrigin = camera.Position;
             Vector3D rayDirection = farPoint - nearPoint;
             rayDirection.Normalize();
@@ -316,23 +331,18 @@ namespace PlanetSimulationCW.ViewModel
 
         public static Matrix3D GetViewMatrix(PerspectiveCamera camera)
         {
-            // Создаем матрицу вида на основе параметров камеры
             Vector3D lookDirection = -camera.LookDirection;
             Vector3D upDirection = camera.UpDirection;
             Point3D position = camera.Position;
 
-            // Нормализуем направление взгляда
             lookDirection.Normalize();
 
-            // Вычисляем правый вектор как векторное произведение
             Vector3D rightVector = Vector3D.CrossProduct(upDirection, lookDirection);
             rightVector.Normalize();
 
-            // Пересчитываем up вектор для обеспечения ортогональности
             upDirection = Vector3D.CrossProduct(lookDirection, rightVector);
             upDirection.Normalize();
 
-            // Создаем матрицу вида
             Matrix3D viewMatrix = new Matrix3D(
                 rightVector.X, upDirection.X, lookDirection.X, 0,
                 rightVector.Y, upDirection.Y, lookDirection.Y, 0,

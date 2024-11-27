@@ -207,6 +207,24 @@ namespace PlanetSimulationCW.ViewModel
                 incorrectValuesCount++;
             }
 
+            if (!byte.TryParse(ColorR, out byte _))
+            {
+                incorrectValuesMessage += nameof(ColorR) + '\n';
+                incorrectValuesCount++;
+            }
+
+            if (!byte.TryParse(ColorG, out byte _))
+            {
+                incorrectValuesMessage += nameof(ColorG) + '\n';
+                incorrectValuesCount++;
+            }
+
+            if (!byte.TryParse(ColorB, out byte _))
+            {
+                incorrectValuesMessage += nameof(ColorB) + '\n';
+                incorrectValuesCount++;
+            }
+
             if (incorrectValuesCount > 0)
             {
                 MessageBox.Show(incorrectValuesMessage);
