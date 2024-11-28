@@ -181,6 +181,11 @@ namespace PlanetSimulationCW.ViewModel
                     Global.controlPanelWindow.Show();
                 }
             }
+
+            if (e.Key == Key.Space) // Если нажата P, открыть панель управления (если она закрыта)
+            {
+                (Global.controlPanelWindow?.DataContext as ControlPanelVM)?.ToggleSimulation(null);
+            }
         }
 
         // Запускает таймер (movementStopwatch), который влияет на плавное увеличение скорости перемещения камеры, если клавиши перемещения зажаты

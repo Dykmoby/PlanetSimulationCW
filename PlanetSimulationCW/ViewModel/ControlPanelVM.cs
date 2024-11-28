@@ -292,7 +292,7 @@ namespace PlanetSimulationCW.ViewModel
             FollowPlanetButtonText = "Unfollow";
         }
 
-        private void ToggleSimulation(object e)
+        public void ToggleSimulation(object e)
         {
             Global.simulationStopped = !Global.simulationStopped;
             if (Global.simulationStopped)
