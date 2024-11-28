@@ -233,11 +233,11 @@ namespace PlanetSimulationCW.ViewModel
             simulationSpeedMinBase = "1";
             simulationSpeedMinPow = "0";
             simulationSpeedMaxBase = "1";
-            simulationSpeedMaxPow = "13";
+            simulationSpeedMaxPow = "12";
             SimulationSpeedMinBase = "1";
             SimulationSpeedMinPow = "0";
             SimulationSpeedMaxBase = "1";
-            SimulationSpeedMaxPow = "13";
+            SimulationSpeedMaxPow = "12";
         }
 
         private void EditPlanet(object e)
@@ -407,7 +407,17 @@ namespace PlanetSimulationCW.ViewModel
             selectedPlanet = planet;
             FollowPlanetButtonText = "Follow";
             PlanetButtonsEnabled = true;
-            PlanetInfoText = selectedPlanet.Color.ToString() + '\n';
+            PlanetInfoText = "Color: " + selectedPlanet.Color.ToString() + '\n' +
+                             "Position:\n" +
+                             "  X: " + selectedPlanet.Position.X.ToString("##.##") + '\n' +
+                             "  Y: " + selectedPlanet.Position.Y.ToString("##.##") + '\n' +
+                             "  Z: " + selectedPlanet.Position.Z.ToString("##.##") + '\n' +
+                             "Velocity: \n" +
+                             "  X: " + selectedPlanet.Velocity.X.ToString() + '\n' +
+                             "  Y: " + selectedPlanet.Velocity.Y.ToString() + '\n' +
+                             "  Z: " + selectedPlanet.Velocity.Z.ToString() + '\n' +
+                             "Mass: " + selectedPlanet.Mass.ToString("##.##") + '\n' +
+                             "Radius: " + selectedPlanet.Radius.ToString("##.##");
         }
 
         public void ClearPlanetInfo()
