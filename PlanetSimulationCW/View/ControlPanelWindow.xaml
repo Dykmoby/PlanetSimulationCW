@@ -14,8 +14,8 @@
     </i:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition MinHeight="250"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Vertical" Grid.Row="0">
@@ -99,6 +99,6 @@
             <Button Content="Edit" Height="20.5" VerticalAlignment="Top" Margin="5,5,5,5" Command="{Binding EditPlanetCommand}" Grid.Column="1" IsEnabled="{Binding PlanetButtonsEnabled}"/>
             <Button Content="{Binding FollowPlanetButtonText, FallbackValue='Follow'}" Height="20.5" VerticalAlignment="Top" Margin="5,5,5,5" Command="{Binding FollowPlanetCommand}" Grid.Column="2" IsEnabled="{Binding PlanetButtonsEnabled}"/>
         </Grid>
-        <ScrollViewer Grid.Row="1" Content="{Binding PlanetInfoText}" Margin="5, 30, 5, 5" Height="Auto"/>
+        <ScrollViewer Grid.Row="1" Content="{Binding PlanetInfoText}" Margin="5, 30, 5, 5" Height="Auto" VerticalAlignment="Stretch"/>
     </Grid>
 </Window>

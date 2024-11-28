@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PlanetSimulationCW.View"
         mc:Ignorable="d"
-        Title="EditPlanetWindow" Height="450" Width="450">
+        Title="EditPlanetWindow" Height="250" Width="450" MinHeight="225" MinWidth="400">
     <Grid>
         <StackPanel Orientation="Vertical">
             <Grid>
@@ -64,15 +64,14 @@
                 <TextBox Text="{Binding ColorG, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="2"/>
                 <TextBox Text="{Binding ColorB, FallbackValue='0'}" Margin="5, 5, 5, 5" Grid.Column="3"/>
             </Grid>
-
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Button Content="Cancel" Margin="5,5,5,5" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
-                <Button Content="Apply" Margin="5,5,5,5" Command="{Binding ApplyCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="1"/>
-            </Grid>
         </StackPanel>
+        <Grid VerticalAlignment="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Cancel" Margin="5,5,5,5" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="0"/>
+            <Button Content="Apply" Margin="5,5,5,5" Command="{Binding ApplyCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="1"/>
+        </Grid>
     </Grid>
 </Window>
