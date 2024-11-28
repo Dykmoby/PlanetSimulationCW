@@ -152,8 +152,6 @@ namespace PlanetSimulationCW.ViewModel
                 (Global.controlPanelWindow?.DataContext as ControlPanelVM)?.ClearPlanetInfo();
                 return;
             }
-
-            (Global.controlPanelWindow?.DataContext as ControlPanelVM)?.DisplayPlanetInfo(selectedPlanet);
         }
 
         private void OnKeyDown(KeyEventArgs e)
@@ -182,7 +180,7 @@ namespace PlanetSimulationCW.ViewModel
                 }
             }
 
-            if (e.Key == Key.Space) // Если нажата P, открыть панель управления (если она закрыта)
+            if (e.Key == Key.Space) // Поставить симуляцию на паузу
             {
                 (Global.controlPanelWindow?.DataContext as ControlPanelVM)?.ToggleSimulation(null);
             }
@@ -225,6 +223,10 @@ namespace PlanetSimulationCW.ViewModel
         {
             frameStopwatch.Restart();
             MoveCamera();
+            if (selectedPlanet != null)
+            {
+                (Global.controlPanelWindow?.DataContext as ControlPanelVM)?.DisplayPlanetInfo(selectedPlanet);
+            }
 
             // Отрисовка планет во View
             ModelGroup = CreateModelGroup(Simulation.Instance.planets, Simulation.Instance.octree);
