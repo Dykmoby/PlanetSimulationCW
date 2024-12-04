@@ -81,67 +81,6 @@ namespace PlanetSimulationCW.Model
                     planets.RemoveAt(i);
                 }
             }
-
-
-            //float deltaTimeSquared = deltaTime * deltaTime;
-            //for (int i = 0; i < planets.Count; i++)
-            //{
-            //    if (planets[i].Destroyed)
-            //    {
-            //        continue;
-            //    }
-            //    for (int k = 0; k < planets.Count; k++)
-            //    {
-            //        if (i == k || planets[k].Destroyed)
-            //        {
-            //            continue;
-            //        }
-
-            //        Vector3 delta = planets[k].Position - planets[i].Position;
-
-            //        float distanceSqr = Vector3.Dot(delta, delta);
-
-            //        // Collision
-            //        if (distanceSqr < (planets[i].Radius + planets[k].Radius) * (planets[i].Radius + planets[k].Radius))
-            //        {
-            //            if (planets[i].Mass > planets[k].Mass)
-            //            {
-            //                planets[i].Collide(planets[k]);
-            //                continue;
-            //            }
-            //            else
-            //            {
-            //                planets[k].Collide(planets[i]);
-            //                break;
-            //            }
-            //        }
-
-            //        float invDistanceSqr = 1.0f / distanceSqr;
-            //        Vector3 direction = Vector3.Normalize(delta);
-
-            //        float acceleration = (float)(5000000000 * G * planets[k].Mass * invDistanceSqr);
-
-            //        planets[i].AddAcceleration(direction * acceleration);
-
-            //        if (planets[i].Acceleration.Length() >= SPEED_OF_LIGHT)
-            //        {
-            //            planets[i].SetAcceleration(direction * (SPEED_OF_LIGHT - 100));
-            //        }
-            //    }
-            //}
-
-            //for (int i = 0; i < planets.Count; i++)
-            //{
-            //    if (planets[i].Destroyed == true)
-            //    {
-            //        planets.RemoveAt(i);
-            //    }
-            //}
-
-            //for (int i = 0; i < planets.Count; i++)
-            //{
-            //    planets[i].Move(deltaTimeSquared);
-            //}
         }
     }
 }
