@@ -79,6 +79,17 @@ namespace PlanetSimulationCW.ViewModel
             }
         }
 
+        private Visibility controlPanelButtonVisibility;
+        public Visibility ControlPanelButtonVisibility
+        {
+            get { return controlPanelButtonVisibility; }
+            set
+            {
+                controlPanelButtonVisibility = value;
+                OnPropertyChanged(nameof(ControlPanelButtonVisibility));
+            }
+        }
+
         public RelayCommand<MouseButtonEventArgs> MouseRightButtonDownCommand { get; private set; }
         public RelayCommand<MouseEventArgs> MouseMoveCommand { get; private set; }
         public RelayCommand<MouseButtonEventArgs> MouseRightButtonUpCommand { get; private set; }
@@ -87,11 +98,13 @@ namespace PlanetSimulationCW.ViewModel
         public RelayCommand<KeyEventArgs> KeyUpCommand { get; private set; }
         public RelayCommand MainWindowClosedCommand { get; private set; }
         public RelayCommand MainWindowDeactivatedCommand { get; private set; }
+        public RelayCommand ShowControlPanelCommand { get; private set; }
 
         public MainVM(Viewport3D viewport)
         {
             this.viewport = viewport;
             Global.setCameraDeltaPos += () => { cameraDeltaPos = (Point3D)(Camera.Position - (Point3D)selectedPlanet!.Position); };
+            Global.hideControlPanel += () => { ControlPanelVisibility = Visibility.Hidden; ControlPanelButtonVisibility = Visibility.Visible; };
 
             Simulation.Instance.AddPlanets(800);
 
@@ -106,6 +119,8 @@ namespace PlanetSimulationCW.ViewModel
             timer.Tick += Update;
             timer.Start();
 
+            ControlPanelVisibility = Visibility.Hidden;
+
             MouseRightButtonDownCommand = new RelayCommand<MouseButtonEventArgs>(OnMouseRightButtonDown);
             MouseMoveCommand = new RelayCommand<MouseEventArgs>(OnMouseMove);
             MouseRightButtonUpCommand = new RelayCommand<MouseButtonEventArgs>(OnMouseRightButtonUp);
@@ -114,6 +129,7 @@ namespace PlanetSimulationCW.ViewModel
             KeyUpCommand = new RelayCommand<KeyEventArgs>(OnKeyUp);
             MainWindowClosedCommand = new RelayCommand(obj => { Application.Current.Shutdown(0); });
             MainWindowDeactivatedCommand = new RelayCommand(obj => { pressedKeys.Clear(); });
+            ShowControlPanelCommand = new RelayCommand(obj => { ControlPanelVisibility = Visibility.Visible; ControlPanelButtonVisibility = Visibility.Hidden; });
         }
 
         private void OnMouseRightButtonDown(MouseButtonEventArgs e)
@@ -178,14 +194,6 @@ namespace PlanetSimulationCW.ViewModel
             {
                 TryResetMovementStopwatch(e.Key);
                 pressedKeys.Remove(e.Key);
-            }
-
-            if (e.Key == Key.P) // Если нажата P, открыть панель управления (если она закрыта)
-            {
-                if (ControlPanelVisibility == Visibility.Visible)
-                    ControlPanelVisibility = Visibility.Hidden;
-                else if (ControlPanelVisibility == Visibility.Hidden)
-                    ControlPanelVisibility = Visibility.Visible;
             }
 
             if (e.Key == Key.Space) // Поставить симуляцию на паузу

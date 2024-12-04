@@ -197,6 +197,7 @@ namespace PlanetSimulationCW.ViewModel
         public RelayCommand SaveDBCommand { get; private set; }
         public RelayCommand EditPlanetCommand { get; private set; }
         public RelayCommand FollowPlanetCommand { get; private set; }
+        public RelayCommand HideControlPanelCommand { get; private set; }
 
 
         public Planet? selectedPlanet;
@@ -211,6 +212,7 @@ namespace PlanetSimulationCW.ViewModel
             SaveDBCommand = new RelayCommand(SaveDB);
             EditPlanetCommand = new RelayCommand(EditPlanet);
             FollowPlanetCommand = new RelayCommand(FollowPlanet);
+            HideControlPanelCommand = new RelayCommand(obj => { Global.hideControlPanel!.Invoke(); });
 
 
             if (Global.simulationStopped)

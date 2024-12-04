@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PlanetSimulationCW"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" MinHeight="100" MinWidth="177">
+        Title="MainWindow" Height="500" Width="800" MinHeight="500" MinWidth="500">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="KeyDown">
             <local:KeyEventArgsCommandAction Command="{Binding KeyDownCommand}"/>
@@ -48,6 +48,7 @@
             <Grid x:Name="controlPanel">
                 <Grid.RowDefinitions>
                     <RowDefinition MinHeight="250"/>
+                    <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
@@ -132,9 +133,11 @@
                     <Button Content="Edit" Height="20.5" VerticalAlignment="Top" Margin="5,5,5,5" Command="{Binding EditPlanetCommand}" Grid.Column="1" IsEnabled="{Binding PlanetButtonsEnabled}"/>
                     <Button Content="{Binding FollowPlanetButtonText, FallbackValue='Follow'}" Height="20.5" VerticalAlignment="Top" Margin="5,5,5,5" Command="{Binding FollowPlanetCommand}" Grid.Column="2" IsEnabled="{Binding PlanetButtonsEnabled}"/>
                 </Grid>
-                <ScrollViewer Grid.Row="1" Content="{Binding PlanetInfoText}" Margin="5, 30, 5, 5" Height="Auto" VerticalAlignment="Stretch"/>
-        </Grid>
-    </StackPanel>
-        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding Log}" VerticalAlignment="Top" Foreground="White" IsHitTestVisible="False"/>
+                <ScrollViewer Grid.Row="1" Content="{Binding PlanetInfoText}" Margin="5, 30, 5, 5" Height="130" VerticalAlignment="Stretch"/>
+                <Button Grid.Row="2" VerticalAlignment="Bottom" Content="Close" Height="20.5" Margin="5,5,5,5" Command="{Binding HideControlPanelCommand}"/>
+            </Grid>
+        </StackPanel>
+        <Button VerticalAlignment="Top" HorizontalAlignment="Left" Content="CP" Height="25" FontSize="16" Margin="5,5,5,5" Command="{Binding ShowControlPanelCommand}" Visibility="{Binding ControlPanelButtonVisibility}"/>
+        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding Log}" Foreground="White" IsHitTestVisible="False"/>
     </Grid>
 </Window>

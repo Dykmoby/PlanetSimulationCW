@@ -12,5 +12,6 @@ namespace PlanetSimulationCW.Model
         public static ControlPanelVM controlPanelVM;
         public static ApplicationContext? db;
         public static Action? setCameraDeltaPos;
+        public static Action? hideControlPanel;
     }
 }
