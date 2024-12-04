@@ -1,4 +1,5 @@
-﻿using PlanetSimulationCW.ViewModel;
+﻿using PlanetSimulationCW.Model;
+using PlanetSimulationCW.ViewModel;
 using System.Windows;
 
 namespace PlanetSimulationCW
@@ -9,6 +10,8 @@ namespace PlanetSimulationCW
         {
             InitializeComponent();
             DataContext = new MainVM(viewport);
+            Global.controlPanelVM = new ControlPanelVM();
+            controlPanel.DataContext = Global.controlPanelVM;
         }
     }
 }

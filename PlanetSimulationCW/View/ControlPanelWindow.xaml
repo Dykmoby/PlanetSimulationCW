@@ -7,11 +7,6 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="Control Panel" Height="450" Width="300">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closed">
-            <i:InvokeCommandAction Command="{Binding ControlPanelClosedCommand}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition MinHeight="250"/>

@@ -195,7 +195,6 @@ namespace PlanetSimulationCW.ViewModel
         public RelayCommand<KeyEventArgs> SimulationSpeedTextBoxKeyUpCommand { get; private set; }
         public RelayCommand LoadDBCommand { get; private set; }
         public RelayCommand SaveDBCommand { get; private set; }
-        public RelayCommand ControlPanelClosedCommand { get; private set; }
         public RelayCommand EditPlanetCommand { get; private set; }
         public RelayCommand FollowPlanetCommand { get; private set; }
 
@@ -210,7 +209,6 @@ namespace PlanetSimulationCW.ViewModel
             SimulationSpeedTextBoxKeyUpCommand = new RelayCommand<KeyEventArgs>(SimulationSpeedTextBoxKeyUp);
             LoadDBCommand = new RelayCommand(LoadDB);
             SaveDBCommand = new RelayCommand(SaveDB);
-            ControlPanelClosedCommand = new RelayCommand(Close);
             EditPlanetCommand = new RelayCommand(EditPlanet);
             FollowPlanetCommand = new RelayCommand(FollowPlanet);
 
@@ -397,15 +395,9 @@ namespace PlanetSimulationCW.ViewModel
             }
         }
 
-        private void Close(object e)
-        {
-            Global.controlPanelWindow = null;
-        }
-
         public void DisplayPlanetInfo(Planet planet)
         {
             selectedPlanet = planet;
-            FollowPlanetButtonText = "Follow";
             PlanetButtonsEnabled = true;
             PlanetInfoText = "Color: " + selectedPlanet.Color.ToString() + '\n' +
                              "Position:\n" +

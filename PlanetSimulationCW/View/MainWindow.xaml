@@ -44,6 +44,97 @@
                 <ModelVisual3D Content="{Binding ModelGroup}"/>
             </Viewport3D.Children>
         </Viewport3D>
+        <StackPanel Visibility="{Binding ControlPanelVisibility}" Background="White" Height="450" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid x:Name="controlPanel">
+                <Grid.RowDefinitions>
+                    <RowDefinition MinHeight="250"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Orientation="Vertical" Grid.Row="0">
+                    <Button Content="{Binding PauseButtonText, FallbackValue='Pause'}" Margin="20,5,20,5" Command="{Binding ToggleSimulationCommand}"/>
+                    <Button Content="Load DB" Margin="20,5,20,5" Command="{Binding LoadDBCommand}"/>
+                    <Button Content="Save DB" Margin="20,5,20,5" Command="{Binding SaveDBCommand}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Content="{Binding ToggleFPSLockButtonText, FallbackValue='Lock FPS'}" Margin="20,5,5,5" Command="{Binding ToggleFPSLockCommand}" Grid.Column="0"/>
+                        <TextBox Text="{Binding FpsLockValue, FallbackValue='60'}" Margin="5,5,20,5" Grid.Column="1">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="KeyUp">
+                                    <local:KeyEventArgsCommandAction Command="{Binding FpsLockTextBoxKeyUpCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TextBox>
+                    </Grid>
+
+                    <Label Content="Simulation speed (min, max):" HorizontalAlignment="Center"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="{Binding SimulationSpeedMinBase, FallbackValue='1'}" Margin="5,5,5,5" Grid.Column="0">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="KeyUp">
+                                    <local:KeyEventArgsCommandAction Command="{Binding SimulationSpeedTextBoxKeyUpCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TextBox>
+                        <Label Content="* 10^" HorizontalAlignment="Center" Grid.Column="1"/>
+                        <TextBox Text="{Binding SimulationSpeedMinPow, FallbackValue='0'}" Margin="5,5,5,5" Grid.Column="2">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="KeyUp">
+                                    <local:KeyEventArgsCommandAction Command="{Binding SimulationSpeedTextBoxKeyUpCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TextBox>
+
+                        <Label Content="-" HorizontalAlignment="Center" Grid.Column="3"/>
+
+                        <TextBox Text="{Binding SimulationSpeedMaxBase, FallbackValue='0'}" Margin="5,5,5,5" Grid.Column="4">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="KeyUp">
+                                    <local:KeyEventArgsCommandAction Command="{Binding SimulationSpeedTextBoxKeyUpCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TextBox>
+                        <Label Content="* 10^" HorizontalAlignment="Center" Grid.Column="5"/>
+                        <TextBox Text="{Binding SimulationSpeedMaxPow, FallbackValue='0'}" Margin="5,5,5,5" Grid.Column="6">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="KeyUp">
+                                    <local:KeyEventArgsCommandAction Command="{Binding SimulationSpeedTextBoxKeyUpCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TextBox>
+                    </Grid>
+
+                    <Slider Value="{Binding SimulationSpeed}" Margin="5,5,5,5"/>
+
+                    <Label Content="{Binding SimulationSpeedText, FallbackValue='1'}" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                </StackPanel>
+                <Rectangle Stroke="Black" Grid.Row="1"/>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="1" Content="Selected planet info:" Grid.Column="0" Height="30" VerticalAlignment="Top"/>
+                    <Button Content="Edit" Height="20.5" VerticalAlignment="Top" Margin="5,5,5,5" Command="{Binding EditPlanetCommand}" Grid.Column="1" IsEnabled="{Binding PlanetButtonsEnabled}"/>
+                    <Button Content="{Binding FollowPlanetButtonText, FallbackValue='Follow'}" Height="20.5" VerticalAlignment="Top" Margin="5,5,5,5" Command="{Binding FollowPlanetCommand}" Grid.Column="2" IsEnabled="{Binding PlanetButtonsEnabled}"/>
+                </Grid>
+                <ScrollViewer Grid.Row="1" Content="{Binding PlanetInfoText}" Margin="5, 30, 5, 5" Height="Auto" VerticalAlignment="Stretch"/>
+        </Grid>
+    </StackPanel>
         <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding Log}" VerticalAlignment="Top" Foreground="White" IsHitTestVisible="False"/>
     </Grid>
 </Window>

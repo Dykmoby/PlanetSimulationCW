@@ -1,4 +1,6 @@
-﻿namespace PlanetSimulationCW.Model
+﻿using PlanetSimulationCW.ViewModel;
+
+namespace PlanetSimulationCW.Model
 {
     static class Global
     {
@@ -7,7 +9,7 @@
         public static bool showColorLODS = false;
         public static bool followPlanet = false;
         public static long targetFrameTime;
-        public static ControlPanelWindow? controlPanelWindow;
+        public static ControlPanelVM controlPanelVM;
         public static ApplicationContext? db;
         public static Action? setCameraDeltaPos;
     }

@@ -68,6 +68,17 @@ namespace PlanetSimulationCW.ViewModel
             }
         }
 
+        private Visibility controlPanelVisibility;
+        public Visibility ControlPanelVisibility
+        {
+            get { return controlPanelVisibility; }
+            set
+            {
+                controlPanelVisibility = value;
+                OnPropertyChanged(nameof(ControlPanelVisibility));
+            }
+        }
+
         public RelayCommand<MouseButtonEventArgs> MouseRightButtonDownCommand { get; private set; }
         public RelayCommand<MouseEventArgs> MouseMoveCommand { get; private set; }
         public RelayCommand<MouseButtonEventArgs> MouseRightButtonUpCommand { get; private set; }
@@ -81,8 +92,6 @@ namespace PlanetSimulationCW.ViewModel
         {
             this.viewport = viewport;
             Global.setCameraDeltaPos += () => { cameraDeltaPos = (Point3D)(Camera.Position - (Point3D)selectedPlanet!.Position); };
-            Global.controlPanelWindow = new ControlPanelWindow();
-            Global.controlPanelWindow.Show();
 
             Simulation.Instance.AddPlanets(800);
 
@@ -149,7 +158,7 @@ namespace PlanetSimulationCW.ViewModel
             selectedPlanet = SelectPlanet(e.GetPosition((UIElement)e.Source));
             if (selectedPlanet == null)
             {
-                (Global.controlPanelWindow?.DataContext as ControlPanelVM)?.ClearPlanetInfo();
+                Global.controlPanelVM?.ClearPlanetInfo();
                 return;
             }
         }
@@ -173,16 +182,15 @@ namespace PlanetSimulationCW.ViewModel
 
             if (e.Key == Key.P) // Если нажата P, открыть панель управления (если она закрыта)
             {
-                if (Global.controlPanelWindow == null)
-                {
-                    Global.controlPanelWindow = new ControlPanelWindow();
-                    Global.controlPanelWindow.Show();
-                }
+                if (ControlPanelVisibility == Visibility.Visible)
+                    ControlPanelVisibility = Visibility.Hidden;
+                else if (ControlPanelVisibility == Visibility.Hidden)
+                    ControlPanelVisibility = Visibility.Visible;
             }
 
             if (e.Key == Key.Space) // Поставить симуляцию на паузу
             {
-                (Global.controlPanelWindow?.DataContext as ControlPanelVM)?.ToggleSimulation(null);
+                Global.controlPanelVM?.ToggleSimulation(null);
             }
         }
 
@@ -225,7 +233,7 @@ namespace PlanetSimulationCW.ViewModel
             MoveCamera();
             if (selectedPlanet != null)
             {
-                (Global.controlPanelWindow?.DataContext as ControlPanelVM)?.DisplayPlanetInfo(selectedPlanet);
+                Global.controlPanelVM?.DisplayPlanetInfo(selectedPlanet);
             }
 
             // Отрисовка планет во View
