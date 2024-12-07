@@ -87,7 +87,7 @@ namespace PlanetSimulationCW.ViewModel
             get { return simulationSpeedMinBase; }
             set
             {
-                if (int.TryParse(value, out int simSpeedMinBase))
+                if (int.TryParse(value, out int simSpeedMinBase) && simSpeedMinBase >= 0)
                 {
                     simulationSpeedMinBase = value;
                     simulationSpeedSliderValueMin = simSpeedMinBase * Math.Pow(10, int.Parse(SimulationSpeedMinPow));
@@ -107,7 +107,7 @@ namespace PlanetSimulationCW.ViewModel
             get { return simulationSpeedMaxBase; }
             set
             {
-                if (int.TryParse(value, out int simSpeedMaxBase))
+                if (int.TryParse(value, out int simSpeedMaxBase) && simSpeedMaxBase >= 0)
                 {
                     simulationSpeedMaxBase = value;
                     simulationSpeedSliderValueMax = simSpeedMaxBase * Math.Pow(10, int.Parse(SimulationSpeedMaxPow));
@@ -127,7 +127,7 @@ namespace PlanetSimulationCW.ViewModel
             get { return simulationSpeedMinPow; }
             set
             {
-                if (int.TryParse(value, out int simSpeedMinPow))
+                if (int.TryParse(value, out int simSpeedMinPow) && simSpeedMinPow >= 0)
                 {
                     simulationSpeedMinPow = value;
                     simulationSpeedSliderValueMin = int.Parse(SimulationSpeedMinBase) * Math.Pow(10, simSpeedMinPow);
@@ -147,7 +147,7 @@ namespace PlanetSimulationCW.ViewModel
             get { return simulationSpeedMaxPow; }
             set
             {
-                if (int.TryParse(value, out int simSpeedMaxPow))
+                if (int.TryParse(value, out int simSpeedMaxPow) && simSpeedMaxPow >= 0)
                 {
                     simulationSpeedMaxPow = value;
                     simulationSpeedSliderValueMax = int.Parse(SimulationSpeedMaxBase) * Math.Pow(10, simSpeedMaxPow);
