@@ -1,0 +1,1 @@
+![demo](https://github.com/Dykmoby/PlanetSimulationCW/blob/main/demo.gif)
